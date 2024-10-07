@@ -1,6 +1,7 @@
 ## Steps followed in project development
 
 
+
 ### Setting up project
 
 * Create the new project in Guthub
@@ -20,14 +21,17 @@ conda env list
 
 * Install required packages for notebook experiments (use miniconda)
 ```shell
-pip install youtube-transcript-api pandas openai tqdm elasticsearch matplotlib
+pip install youtube-transcript-api pandas openai tqdm elasticsearch matplotlib sentence-transformers transformers
 pip freeze > requirements.txt
 ```
 
 
+
 ### Notebook Experiments
 
-**Data Preparation: ** This notebook contains experimental codes to transcript videos, chunk input transcript, clean text and generate summary. Run `Ollama` in docker and use `phi3`(if ram>=6GB) or `gemma2:2b` to clean and summarize the text. The downloaded model can be tested with ollama terminal command `ollama run gemma2:2b`.
+**Data Preparation:** This notebook contains experimental codes to transcript videos, chunk input transcript, clean text and generate summary & keywords. This notebook also contains codes for ElasticSearch text and hybrid search based retrieval operations coupled with a basic rag pipeline following aforementioned steps.
+
+Run `Ollama` in docker and use `phi3`(if ram>=6GB or GPU>=4GB) or `gemma2:2b` to clean and summarize the text. The downloaded model can be tested with ollama terminal command `ollama run gemma2:2b`.
 ```shell
 docker run -it \
     -v ollama:/root/.ollama \
@@ -39,9 +43,10 @@ docker run -it \
 docker exec -it ollama bash
 ollama pull gemma2:2b
 ```
-> Note: Gemma2:2b has a context length of ~8000 so try not to exceed 5000 words, could cause to drop the input text from prompts.
 
-In the later parts of same notebook, embedding and ElasticSearch indexing is being done. This requires running `ElastucSearch` in docker with below terminal command. Once it starts running, ES cluster information can be checked with terminal command `curl localhost:9200`.
+> Note: Gemma2:2b has a context length of ~8000 so try not to exceed 5000 words, could cause to drop the input text from prompts. Use `phi3` for better responses and use `gemma2:2b` for fast responses. Its suggested to use phi3 to generate summarized chunks so that RAG will have better contexts to use to generate replies. However, upon multiple runs it was also observed that phi3 generated random gibberish instead of summary for most of the text blocks, worth looking into in future modifications.
+
+In the later parts of same notebook, sentence embedding and ElasticSearch indexing is being done. This requires running `ElasticSearch` in docker with below terminal command. Once it starts running, ES cluster information can be checked with terminal command `curl localhost:9200`.
 ```shell
 docker run -it \
 --rm \
@@ -53,7 +58,7 @@ docker run -it \
 docker.elastic.co/elasticsearch/elasticsearch:8.4.3
 ```
 
-**Docker Compose: ** Above both docker services can be run at once with below  `docker-compose.yaml` content. Use terminal command `docker compose up -d` from the directory containing this file.
+**Docker Compose:** Above both docker services can be run at once with below  `docker-compose.yaml` content. Use terminal command `docker compose up -d` from the directory containing this file.
 ```yaml
 services:
   elasticsearch:
@@ -73,7 +78,7 @@ services:
       - "11434:11434"
 ```
 
-
+> Note: Running both of these docker services drained my 8GB RAM completely which only had limited free ram available with other applications running. So, I switched to using GPU to run ollama model. This modified compose file can be run with command `docker compose -f docker-compose-gpu.yml up -d`.
 
 
 

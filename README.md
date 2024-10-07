@@ -23,8 +23,8 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 ## Workflow
 
 - [x] Notebook Experiment: Data Preparation(Transcription, Cleaning & Summarization)
-- [ ] Notebook Experiment: Data Preparation(Chunking, Embedding & ElasticSearch Indexing)
-- [ ] Notebook Experiment: Basic RAG pipeline (Search - Text|Vector|Hybrid)
+- [x] Notebook Experiment: Data Preparation(Chunking, Embedding & ElasticSearch Indexing)
+- [x] Notebook Experiment: Basic RAG pipeline (Search - Text|Vector|Hybrid)
 - [ ] Notebook Experiment: Generate Gold Standard Data
 - [ ] Notebook Experiment: Evaluate Retrieval and RAG Flow (Add Hyperopt based optimization parameters)
 - [ ] AirFlow: Data Ingestion Pipeline
@@ -40,6 +40,8 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 - [ ] Add Documentation
 
 
+
+> Note: Check `development_guide.md` for a detailed documentation of experiments and steps taken to develop this project.
 
 ## Data Preparation
 
