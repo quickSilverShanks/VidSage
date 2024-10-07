@@ -80,6 +80,10 @@ services:
 
 > Note: Running both of these docker services drained my 8GB RAM completely which only had limited free ram available with other applications running. So, I switched to using GPU to run ollama model. This modified compose file can be run with command `docker compose -f docker-compose-gpu.yml up -d`.
 
+Below command can be used to check the existing list of index in ElasticSearch(vidsage-elasticsearch-1 is the name of ES container running from above docker compose command):
+```shell
+docker exec -it vidsage-elasticsearch-1 /bin/bash -c 'curl -X GET "localhost:9200/_cat/indices?v"'
+```
 
 
 <br><br><br><hr><hr>
