@@ -134,9 +134,11 @@ def process_and_index_video(video_id, index_name, filepath):
     Returns:
         None
     """
-    print(f"INFO: processing tarnscript data for video_id: {video_id}")
-    # Placeholder: Implement the logic to extract, process, and save the video transcript as json document
-    process_transcript(video_id, filepath)
+    if os.path.exists(filepath+"/tscribe_vid_"+video_id+".json"):
+        print(f"INFO: processed transcript data exists for video_id: {video_id}")
+    else:
+        print(f"INFO: processing transcript data for video_id: {video_id}")
+        process_transcript(video_id, filepath)
 
     print(f"INFO: indexing data for video_id: {video_id}")
     index_doc(filepath+"/tscribe_vid_"+video_id+".json", index_name)
