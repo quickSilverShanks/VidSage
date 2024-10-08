@@ -7,6 +7,8 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
 
   ollama:
     image: ollama/ollama
@@ -23,4 +25,5 @@ services:
             count: all  # adjust count for the number of GPUs you want to use
 
 volumes:
+  elasticsearch-data:
   ollama:

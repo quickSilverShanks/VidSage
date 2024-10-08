@@ -45,13 +45,13 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 
 ## Data Preparation
 
-Use the script `generate_smry.py` to generate and save pickle files with uid, original video transcript and summarized text columns. For a given video_id, run the script with below terminal command
+Use the script `generate_smry.py` to generate and save transcript documents as json files with uid, original video transcript, summarized text and keywords columns. For a given video_id, run the script with below terminal command(make sure you're in the root folder)
 ```shell
-python generate_smry.py --vid zjkBMFhNj_g --dest ./data/summary_transcripts
+!python ./scripts/get_transcript.py --video_id zjkBMFhNj_g --index_name video-transcripts-vect --filepath ../data/summary_transcripts
 ```
 > The column 'uid' is created by appending video_id, block_id and start_time separated by '__' so that it can be extracted later on if needed.
 
-Rather than running this script multiple times, prepare a single csv file with 20 video ids(or any preferred number) and run the script `generate_allsmry.py` with below command to get all the summaries for all 20 videos in a single pickle file. This will generate the combined pickle file `allsmry.pkl`.
+Rather than running this script multiple times, prepare a single csv file with 10 video ids(or any preferred number) and run the script `get_multitranscript.py` with below command to get all the summaries for all 20 videos in a single json file. This will generate the combined json file `multi_tscribe.json`.
 ```shell
-python generate_allsmry.py --inp vidsource.csv --dest ./data/summary_transcripts
+python get_multitranscript.py --inp vidsource.csv --dest ./data/summary_transcripts
 ```

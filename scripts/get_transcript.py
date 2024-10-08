@@ -1,10 +1,10 @@
 import json
-from tqdm import tqdm
+import click
+from ingest_data import *
 from elasticsearch import Elasticsearch
 from sentence_transformers import SentenceTransformer
 
-VIDEO_ID = 'zjkBMFhNj_g'
-INDEX_NAME = "video-transcripts-vect"
+
 VECTOR_MODEL = 'multi-qa-MiniLM-L6-cos-v1'
 VECTOR_DIMS = 384
 
@@ -18,7 +18,7 @@ INDEX_SETTINGS = {
     },
     "mappings": {
         "properties": {
-            "uid": {"type": "text"},
+            "uid": {"type": "keyword"},
             "text": {"type": "text"},
             "smry_text": {"type": "text"},
             "clean_text": {"type": "text"},
@@ -58,6 +58,7 @@ INDEX_SETTINGS = {
 }
 
 
+
 def load_jsonfile(filename):
     '''
     filename : filepath and filename(.json file) as a single string
@@ -68,11 +69,12 @@ def load_jsonfile(filename):
     return data_json
 
 
+
 def index_doc(filename, index_name):
     documents = load_jsonfile(filename)
 
     print(f"INFO: creating vector embeddings")
-    for doc in tqdm(documents):
+    for doc in documents:
         text = doc['text']
         smry_text = doc['smry_text']
         clean_text = doc['clean_text']
@@ -86,8 +88,11 @@ def index_doc(filename, index_name):
         doc['kwords_smry_vector'] = model.encode(kwords_smry)
 
     print(f"INFO: adding documents to index")
-    for doc in tqdm(documents):
+    for doc in documents:
         es_client.index(index=index_name, document=doc)
+    
+    print(f"INFO: added {len(documents)} documents to index")
+
 
 
 def is_video_id_indexed(video_id, index_name):
@@ -118,7 +123,8 @@ def is_video_id_indexed(video_id, index_name):
     return False
 
 
-def process_and_index_video(video_id, index_name):
+
+def process_and_index_video(video_id, index_name, filepath):
     """
     Process the video transcript for the provided video_id and index it into Elasticsearch.
     
@@ -130,35 +136,48 @@ def process_and_index_video(video_id, index_name):
     """
     print(f"INFO: processing tarnscript data for video_id: {video_id}")
     # Placeholder: Implement the logic to extract, process, and save the video transcript as json document
+    process_transcript(video_id, filepath)
 
     print(f"INFO: indexing data for video_id: {video_id}")
-    index_doc("../data/summary_transcripts/tscribe_vid_"+video_id+".json", index_name)
+    index_doc(filepath+"/tscribe_vid_"+video_id+".json", index_name)
 
 
-def check_and_index_video(video_id, index_name):
+
+@click.command()
+@click.option(
+    "--video_id",
+    help="Video ID of the youtube video to check and index if not found. It can be found in url.\
+    For instance, https://www.youtube.com/watch?v=2pWv7GOvuf0 has the video_id '2pWv7GOvuf0'"
+)
+@click.option(
+    "--index_name",
+    default="video-transcripts-vect",
+    help="The ElasticSearch Index that will keep the processed transcript documents from specified youtube videos"
+)
+@click.option(
+    "--filepath",
+    default="../data/summary_transcripts",
+    help="Location where the processed data will be saved"
+)
+def check_and_index_video(video_id, index_name, filepath):
     """
+    If provided index_name does not exist, it will be created.
     Checks if the provided video_id's data is already indexed in Elasticsearch.
     If not, processes and indexes the video data.
-    
-    Args:
-        video_id (str): The video ID to check and index if not found.
-        index_name (str): The Elasticsearch index to check in. Default is "video-transcripts".
-    
-    Returns:
-        None
     """
     if not es_client.indices.exists(index=index_name):
         print(f"INFO: index does not exist.")
         es_client.indices.create(index=index_name, body=INDEX_SETTINGS)
         print(f"INFO: index '{index_name}' created.")
         print(f"INFO: processing and indexing data for video_id {video_id}...")
-        process_and_index_video(video_id, index_name)
+        process_and_index_video(video_id, index_name, filepath)
     elif is_video_id_indexed(video_id, index_name):
         print(f"INFO: data for video_id {video_id} is already indexed.")
     else:
         print(f"INFO: data for video_id {video_id} not found. processing and indexing...")
-        process_and_index_video(video_id, index_name)
+        process_and_index_video(video_id, index_name, filepath)
 
 
-# Example usage
-check_and_index_video(VIDEO_ID, INDEX_NAME)
+
+if __name__ == "__main__":
+    check_and_index_video()
