@@ -22,7 +22,7 @@ conda env list
 * Install required packages for notebook experiments (use miniconda)
 ```shell
 pip install youtube-transcript-api pandas openai tqdm elasticsearch matplotlib sentence-transformers transformers
-pip freeze > requirements.txt
+pip freeze > requirements_dev.txt
 ```
 
 
@@ -58,7 +58,7 @@ docker run -it \
 docker.elastic.co/elasticsearch/elasticsearch:8.4.3
 ```
 
-**Docker Compose:** Above both docker services can be run at once with below  `docker-compose.yaml` content. Use terminal command `docker compose up -d` from the directory containing this file.
+**Docker Compose:** Above both docker services can be run at once with below `docker-compose.yaml` content. Use terminal command `docker compose up -d` from the directory containing this file.
 ```yaml
 services:
   elasticsearch:
