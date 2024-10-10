@@ -28,7 +28,7 @@ def show_addvideo_ui():
     col1, col2 = st.columns([1, 6])     # create two columns: one for the image and one for the title
 
     with col1:
-        st.image("./app/logo.jpg", width=80)
+        st.image("logo.jpg", width=80)
     
     with col2:
         st.markdown(

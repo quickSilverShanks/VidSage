@@ -22,13 +22,14 @@ st.markdown(
 
 def show_home_page():
 
-    st.image("./app/logo.jpg")
+    st.image("logo.jpg")
 
     # apply the custom CSS class to the title
     st.markdown('<h1 class="title-class">An AI-Powered YouTube Video Assistant</h1>', unsafe_allow_html=True)
 
     st.write("""
-        VidSage is an AI-powered YouTube Video Assistant. You can chat with the AI Assistant that uses selected youtube video's content or explore the video insights.
+        VidSage is a RAG-based architecture that transforms YouTube videos into interactive knowledge sources.
+        \nBy providing a YouTube video ID, VidSage generates a complete transcript, a text summary and allows users to ask detailed questions about the video's content.
         \nUse the sidebar to navigate between the 'Add Video', 'AI Assistant' and 'Video Insights' options, or come back to this home page anytime.
         \nThere will be more features to come, feel free to drop in suggestions and feedback.
         If you like this project please don't forget to star the [GitHub repo](https://github.com/quickSilverShanks/VidSage/).

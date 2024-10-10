@@ -69,13 +69,19 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
 
   ollama:
     image: ollama/ollama
     volumes:
-      - ./ollama:/root/.ollama  # Mount your local .ollama directory for configuration; feel free to change local folder
+      - ollama:/root/.ollama
     ports:
       - "11434:11434"
+
+volumes:
+  elasticsearch-data:
+  ollama:
 ```
 
 > Note: Running both of these docker services drained my 8GB RAM completely which only had limited free ram available with other applications running. So, I switched to using GPU to run ollama model. This modified compose file can be run with command `docker compose -f docker-compose-gpu.yml up -d`.
@@ -85,6 +91,10 @@ Below command can be used to check the existing list of index in ElasticSearch(v
 docker exec -it vidsage-elasticsearch-1 /bin/bash -c 'curl -X GET "localhost:9200/_cat/indices?v"'
 ```
 
+Run `get_indexed_vids.py` script to get a frequency count of number of chunks created/indexed in ElasticSearch.
+```shell
+python ./scripts/get_indexed_vids.py
+```
 
 <br><br><br><hr><hr>
 

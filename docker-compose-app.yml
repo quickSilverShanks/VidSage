@@ -1,0 +1,59 @@
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.4.3
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 20s
+      timeout: 7s
+      retries: 5
+    networks:
+      - vid_network
+
+  ollama:
+    image: ollama/ollama
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia  # use NVIDIA runtime to ensure GPU access
+            capabilities: ["gpu"]
+            count: all  # adjust count for the number of GPUs you want to use
+    networks:
+      - vid_network
+
+  streamlit:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      env_file:
+        - .env
+      ports:
+        - "8501:8501"
+      volumes:
+        - ./app:/app
+        - ./app/app_data:/app/app_data
+      depends_on:
+        elasticsearch:
+          condition: service_healthy
+      networks:
+      - vid_network
+
+volumes:
+  elasticsearch-data:
+  ollama:
+
+networks:
+  vid_network:
+    driver: bridge
