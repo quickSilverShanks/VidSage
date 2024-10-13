@@ -101,6 +101,7 @@ python ./scripts/get_indexed_vids.py
 ### Side notes
 
 Useful Reference Links:
+* Nvidia Container Toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
 * Sample Project: https://github.com/AudhootChavan/llm_zc_2024_project_audhoot_chavan_parlamind/blob/main/README.md
 * Video Transcripts Generation: https://www.geeksforgeeks.org/python-downloading-captions-from-youtube/
 * Ready to Use Transcript Data: https://huggingface.co/datasets/PleIAs/YouTube-Commons

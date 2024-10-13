@@ -14,9 +14,6 @@ RUN pip install --upgrade pip && \
 # Copy the rest of the app files
 COPY app .
 
-# Copy entrypoint.sh script
-COPY entrypoint.sh .
-
 # Make sure entrypoint.sh is executable
 RUN chmod +x entrypoint.sh
 
