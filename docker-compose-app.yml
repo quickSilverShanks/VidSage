@@ -43,11 +43,16 @@ services:
 
   ollama-models-pull:
     image: curlimages/curl:8.6.0
-    command: >-
-      http://ollama:11434/api/pull -d '{"name": "gemma2:2b"}'
+    container_name: vidsage-ollama-models-pull
+    env_file:
+      - .env
+    command: >
+      sh -c "curl -X POST http://vidsage-ollama:11434/api/pull -d '{\"name\": \"${LLM_MODEL}\"}'"
     depends_on:
       ollama:
         condition: service_healthy
+    networks:
+      - vid_network
 
   streamlit:
     build:
