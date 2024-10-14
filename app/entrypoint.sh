@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Run the initialization script
+# Run the initialization script ; deprecated initialization
 # python init-app.py
 
 # Run Streamlit and make it respond properly to shutdown signals

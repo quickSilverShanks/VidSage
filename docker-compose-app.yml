@@ -25,6 +25,12 @@ services:
       - ollama-data:/root/.ollama
     ports:
       - "11434:11434"
+    healthcheck:
+      test: ollama list || exit 1
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
     deploy:
       resources:
         reservations:
@@ -34,6 +40,14 @@ services:
             count: all  # adjust count for the number of GPUs you want to use
     networks:
       - vid_network
+
+  ollama-models-pull:
+    image: curlimages/curl:8.6.0
+    command: >-
+      http://ollama:11434/api/pull -d '{"name": "gemma2:2b"}'
+    depends_on:
+      ollama:
+        condition: service_healthy
 
   streamlit:
     build:
@@ -50,6 +64,8 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
+      # ollama:
+      #   condition: service_healthy
     networks:
     - vid_network
 

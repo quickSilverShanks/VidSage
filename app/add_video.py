@@ -1,6 +1,5 @@
-import streamlit as st
 import time
-
+import streamlit as st
 
 
 def fetch(video_id):
@@ -17,6 +16,18 @@ def fetch(video_id):
     # Simulate successful fetching
     fetched_data = f"Transcript data for {video_id}"
     logs = "Transcript fetched successfully.\n"
+    yield logs
+
+    # Update session state video ids list
+    logs = f"Available video options: {st.session_state['video_options']}\n"
+    yield logs
+
+    if video_id not in st.session_state['video_options']:
+        st.session_state['video_options'].append(video_id)
+        logs = f"Video options updated: {st.session_state['video_options']}\n"
+    else:
+        logs = f"Video ID {video_id} already exists in the options.\n"
+
     yield logs
 
     # Final data fetched (you can return or yield as necessary)

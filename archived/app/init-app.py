@@ -1,6 +1,6 @@
 import os
 import json
-from ollama import Ollama
+# import ollama
 from openai import OpenAI
 from elasticsearch import Elasticsearch
 from sentence_transformers import SentenceTransformer
@@ -100,9 +100,8 @@ def initialize_id_list(index_name):
         return []
 
 
-
-ollama_client = Ollama(base_url=OPENAI_API_URL)
-ollama_client.pull(LLM_MODEL)
+# unable to connect to the ollama service
+# ollama.pull(LLM_MODEL)
 
 LLM_CLIENT = OpenAI(
     base_url=OPENAI_API_URL,

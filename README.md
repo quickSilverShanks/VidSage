@@ -85,10 +85,11 @@ The .env file can be used to configure/modify the default behaviour of applicati
 ```bash
 # LLM
 OPENAI_API_KEY =  "ollama"
+OPENAI_API_URL = 'http://localhost:11434/v1/'
 LLM_MODEL = 'gemma2:2b'
 
 # ElasticSearch
-ELASTICSEARCH_URL = "http://elasticsearch_app:9200"
+ELASTICSEARCH_URL = "http://elasticsearch:9200"
 ES_INDEX = "video-transcripts-app"
 
 # Sentence Embedding

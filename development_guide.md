@@ -107,6 +107,7 @@ Useful Reference Links:
 * Ready to Use Transcript Data: https://huggingface.co/datasets/PleIAs/YouTube-Commons
 * Mastering Summarization Techniques: A Practical Exploration with LLM - Martin Neznal: https://youtu.be/Uoc1k6xdbEg?si=YxAjgjnkTxIRUCz7
 * Another RAG Project: https://github.com/Alexander-Heinz/vdi_chatbot/tree/main
+* Tool support in ollama for future improvements: https://ollama.com/blog/tool-support
 
 Useful Tips:
 * To check how much space is being used by docker, use command  `docker system df -v`.

@@ -1,5 +1,7 @@
 import streamlit as st
+import init_temp
 
+init_temp.initialize_list()
 
 home = st.Page("home.py", title="Home", icon="🏠")
 add_vid = st.Page("add_video.py", title="Add Video", icon="📜")

@@ -1,8 +1,10 @@
+import os
+import json
 import streamlit as st
 import time
 
-video_options = ['Video 1', 'Video 2', 'Video 3', 'Video 4']
-
+# video_options = ['Video 1', 'Video 2', 'Video 3', 'Video 4']
+# video_options = json.loads(os.getenv('ID_LIST'))
 
 
 def generate_response(selected_video, user_query):
@@ -26,7 +28,7 @@ def show_aibot_ui():
             """, unsafe_allow_html=True
         )
 
-    selected_video = st.selectbox('Select Video', video_options)
+    selected_video = st.selectbox('Select Video', st.session_state['video_options'])
     user_query = st.text_input('User Query')
 
     response_status_area = st.empty()       # placeholder for response generation status
