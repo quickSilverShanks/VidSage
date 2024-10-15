@@ -1,27 +1,42 @@
 import streamlit as st
-import time
+
+from utils.rag_hybrid import elastic_search_hybrid, build_prompt, llm
+# from utils.init_app_local import EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, LLM_CLIENT, LLM_MODEL
+from utils.init_app import EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, LLM_CLIENT, LLM_MODEL
 
 
-def generate_response(selected_video, user_query, log_update_callback):
-    logs = f"Generating response for video: {selected_video} and query: {user_query}...\n"
-    log_update_callback(logs)  # Update logs in the UI
-    time.sleep(1)  # Simulate delay in response generation
-
-    logs += "Analyzing video content...\n"
+def generate_response(video_id, query, log_update_callback, n_results=4, context_col='smry_text', debug=0):
+    logs = f"INFO: initiated response generation for video: {video_id} and query: {query}...\n"
     log_update_callback(logs)
-    time.sleep(1)
 
-    logs += "Processing user query...\n"
+    logs += "INFO: encoding user query...\n"
     log_update_callback(logs)
-    time.sleep(1)
+    query_vect = EMBEDDING_MODEL.encode(query)
 
-    logs += f"Response generated successfully for query: {user_query}\n"
+    logs += "INFO: searching ES index for retrieval...\n"
     log_update_callback(logs)
-    return f"Response for {selected_video} with query '{user_query}'", logs
+    search_results = elastic_search_hybrid(query, query_vect, ES_CLIENT, ES_INDEX, video_id, n_results)
+
+    logs += "INFO: building response generation prompt...\n"
+    log_update_callback(logs)
+    prompt = build_prompt(query, search_results, context_col)
+
+    logs += "INFO: generating llm response...\n"
+    log_update_callback(logs)
+    answer = llm(prompt, LLM_CLIENT, LLM_MODEL)
+
+    if debug:
+        logs += f"DEBUG:\n\n\nSearch Results:\n{search_results}\n\n\nGenerated Prompt:\n {prompt}\n\n\nRAG Output:\n{answer}\n"
+        log_update_callback(logs)
+
+    logs += f"INFO: response generated successfully for query: {query}\n"
+    log_update_callback(logs)
+    return f"Response:\n\n{answer}", logs
+
 
 
 def show_aibot_ui():
-    col1, col2 = st.columns([1, 6])  # Create two columns: one for the image and one for the title
+    col1, col2 = st.columns([1, 6])
 
     with col1:
         st.image("logo.jpg", width=80)
@@ -36,53 +51,43 @@ def show_aibot_ui():
     selected_video = st.selectbox('Select Video', st.session_state['video_options'])
     user_query = st.text_input('User Query')
 
-    # Create a two-column layout for the button and spinner
     button_col, spinner_col = st.columns([2, 4])
-    response_status_area = st.empty()  # Placeholder for response generation status
-    log_area = st.empty()  # Placeholder for active log updates below the button
+    response_status_area = st.empty()   # placeholder for response generation status
+    log_area = st.empty()               # placeholder for active log updates below the button
     button_disabled = False
 
-    # Place the button in the first column
     with button_col:
         generate_button = st.button('Generate Response', disabled=button_disabled)
 
-    # The spinner will be shown on the right side of the button during processing
     with spinner_col:
         spinner_placeholder = st.empty()
 
     if generate_button:
         if selected_video and user_query:
-            button_disabled = True  # Disable button to prevent multiple clicks
+            button_disabled = True      # disable button to prevent multiple clicks
 
-            # Display a spinner on the right side of the button
             with spinner_placeholder:
-                with st.spinner("Generating..."):
+                with st.spinner("Generating..."):       # display a spinner on the right side of the button
                     response_logs = ""
 
-                    # Function to update the log area during generation
+                    # function to update the log area during generation
                     def update_logs(log_text):
                         nonlocal response_logs
                         response_logs = log_text
                         log_area.text_area("Active Logs", value=response_logs, height=200, disabled=True)
 
-                    # Generate the response with real-time log updates
+                    # generate the response with real-time log updates
                     response, final_logs = generate_response(selected_video, user_query, update_logs)
 
-            # Clear the active log area after response generation
-            log_area.empty()
+            log_area.empty()                # clear the active log area after response generation
+            spinner_placeholder.empty()     # clear the spinner placeholder after completion
+            response_status_area.empty()    # clear the "Generating Response..." message
+            st.info(response)               # display the rag output
 
-            # Clear the spinner placeholder after completion
-            spinner_placeholder.empty()
-
-            # Update the response status
-            response_status_area.empty()  # Clear the "Generating Response..." message
-            st.info(response)  # Display the actual response in a shaded box
-
-            # Show logs in a collapsible section after completion
             with st.expander("View Response Logs", expanded=False):
                 st.text_area("Response Logs", value=final_logs, height=200, disabled=True)
 
-            button_disabled = False  # Re-enable the button after generation
+            button_disabled = False         # re-enable the button after generation
         else:
             st.error("Please select a video and enter a query")
 
