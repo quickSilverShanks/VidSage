@@ -58,7 +58,7 @@ docker compose -f docker-compose-gpu.yml up -d    # this runs the llm model on g
 
 Use the script `generate_smry.py` to generate and save transcript documents as json files with uid, original video transcript, summarized text and keywords columns. For a given video_id, run the script with below terminal command(make sure you're in the root folder)
 ```shell
-!python ./scripts/get_transcript.py --video_id zjkBMFhNj_g --index_name video-transcripts-vect --filepath ./data/summary_transcripts
+python ./scripts/get_transcript.py --video_id zjkBMFhNj_g --index_name video-transcripts-vect --filepath ./data/summary_transcripts
 ```
 > The column 'uid' is created by appending video_id, block_id and start_time separated by '__' so that it can be extracted later on if needed.
 
@@ -79,27 +79,27 @@ python ./scripts/rag_assistant.py --index_name video-transcripts-vect --video_id
 
 
 
-### StreamLit Application UI
+## StreamLit Application UI
 
 The .env file can be used to configure/modify the default behaviour of application UI:
 ```bash
-# LLM
+# [LLM]
 OPENAI_API_KEY =  "ollama"
-OPENAI_API_URL = 'http://localhost:11434/v1/'
+OPENAI_API_URL = 'http://vidsage-ollama:11434/v1/'
 LLM_MODEL = 'gemma2:2b'
 
-# ElasticSearch
-ELASTICSEARCH_URL = "http://elasticsearch:9200"
+# [ElasticSearch]
+ELASTICSEARCH_URL = "http://vidsage-elasticsearch:9200"
 ES_INDEX = "video-transcripts-app"
 
-# Sentence Embedding
+# [Sentence Embedding]
 VECTOR_MODEL = 'multi-qa-MiniLM-L6-cos-v1'
 VECTOR_DIMS = 384
 
-# YouTube Transcript Config
+# [YouTube Transcript Config]
 LANG = ['en', 'en-US', ]
 
-# PostGreSQL
+# [PostGreSQL]
 DB_NAME = "postgres"
 DB_USER = "postgres"
 DB_PASSWORD = "dbpass"

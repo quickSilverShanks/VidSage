@@ -7,12 +7,21 @@ from sentence_transformers import SentenceTransformer
 from utils.es_indexer import index_doc
 
 
-ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
-ES_INDEX = os.environ.get('ES_INDEX')
-VECTOR_MODEL = os.environ.get('VECTOR_MODEL')
-VECTOR_DIMS = os.environ.get('VECTOR_DIMS')
-OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
-OPENAI_API_URL = os.environ.get('OPENAI_API_URL')
+# [LLM]
+OPENAI_API_KEY =  "ollama"
+OPENAI_API_URL = 'http://localhost:11434/v1/'
+LLM_MODEL = 'gemma2:2b'
+
+# [ElasticSearch]
+ELASTICSEARCH_URL = "http://localhost:9200"
+ES_INDEX = "video-transcripts-app"
+
+# [Sentence Embedding]
+VECTOR_MODEL = 'multi-qa-MiniLM-L6-cos-v1'
+VECTOR_DIMS = 384
+
+# [YouTube Transcript Config]
+LANG = ['en', 'en-US', ]
 
 
 INDEX_SETTINGS = {

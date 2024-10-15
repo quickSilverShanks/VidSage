@@ -1,26 +1,31 @@
-import os
-import json
 import streamlit as st
 import time
 
-# video_options = ['Video 1', 'Video 2', 'Video 3', 'Video 4']
-# video_options = json.loads(os.getenv('ID_LIST'))
 
-
-def generate_response(selected_video, user_query):
+def generate_response(selected_video, user_query, log_update_callback):
     logs = f"Generating response for video: {selected_video} and query: {user_query}...\n"
-    time.sleep(2)  # Simulate delay in response generation
+    log_update_callback(logs)  # Update logs in the UI
+    time.sleep(1)  # Simulate delay in response generation
+
+    logs += "Analyzing video content...\n"
+    log_update_callback(logs)
+    time.sleep(1)
+
+    logs += "Processing user query...\n"
+    log_update_callback(logs)
+    time.sleep(1)
+
     logs += f"Response generated successfully for query: {user_query}\n"
+    log_update_callback(logs)
     return f"Response for {selected_video} with query '{user_query}'", logs
 
 
-
 def show_aibot_ui():
-    col1, col2 = st.columns([1, 6])     # create two columns: one for the image and one for the title
+    col1, col2 = st.columns([1, 6])  # Create two columns: one for the image and one for the title
 
     with col1:
         st.image("logo.jpg", width=80)
-    
+
     with col2:
         st.markdown(
             """
@@ -31,22 +36,53 @@ def show_aibot_ui():
     selected_video = st.selectbox('Select Video', st.session_state['video_options'])
     user_query = st.text_input('User Query')
 
-    response_status_area = st.empty()       # placeholder for response generation status
+    # Create a two-column layout for the button and spinner
+    button_col, spinner_col = st.columns([2, 4])
+    response_status_area = st.empty()  # Placeholder for response generation status
+    log_area = st.empty()  # Placeholder for active log updates below the button
+    button_disabled = False
 
-    if st.button('Generate Response'):
+    # Place the button in the first column
+    with button_col:
+        generate_button = st.button('Generate Response', disabled=button_disabled)
+
+    # The spinner will be shown on the right side of the button during processing
+    with spinner_col:
+        spinner_placeholder = st.empty()
+
+    if generate_button:
         if selected_video and user_query:
-            response_status_area.markdown("<div style='background-color:#77aa44;padding:10px;'>Generating Response...</div>", unsafe_allow_html=True)
+            button_disabled = True  # Disable button to prevent multiple clicks
 
-            # Simulate response generation and log capturing
-            response, response_logs = generate_response(selected_video, user_query)
+            # Display a spinner on the right side of the button
+            with spinner_placeholder:
+                with st.spinner("Generating..."):
+                    response_logs = ""
 
-            response_status_area.empty()        # once the response is generated, clear the "Generating Response..." message
+                    # Function to update the log area during generation
+                    def update_logs(log_text):
+                        nonlocal response_logs
+                        response_logs = log_text
+                        log_area.text_area("Active Logs", value=response_logs, height=200, disabled=True)
 
-            st.info(response)       # display the actual response in a shaded box
+                    # Generate the response with real-time log updates
+                    response, final_logs = generate_response(selected_video, user_query, update_logs)
 
-            # display logs in a collapsible expander section
+            # Clear the active log area after response generation
+            log_area.empty()
+
+            # Clear the spinner placeholder after completion
+            spinner_placeholder.empty()
+
+            # Update the response status
+            response_status_area.empty()  # Clear the "Generating Response..." message
+            st.info(response)  # Display the actual response in a shaded box
+
+            # Show logs in a collapsible section after completion
             with st.expander("View Response Logs", expanded=False):
-                st.text_area("Response Logs", value=response_logs, height=200, disabled=True)
+                st.text_area("Response Logs", value=final_logs, height=200, disabled=True)
+
+            button_disabled = False  # Re-enable the button after generation
         else:
             st.error("Please select a video and enter a query")
 

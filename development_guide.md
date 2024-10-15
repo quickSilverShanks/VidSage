@@ -96,6 +96,33 @@ Run `get_indexed_vids.py` script to get a frequency count of number of chunks cr
 python ./scripts/get_indexed_vids.py
 ```
 
+
+
+### Running the Scripts
+
+Below commands can be used to run Ollama and ElasticSearch Services, pull, pre-process and index the transcript documents and then query the rag assistant.
+```shell
+docker compose -f docker-compose-gpu.yml up -d    # this runs the llm model on gpu, use docker-compose.yml file if gpu is not available
+python ./scripts/get_transcript.py --video_id zjkBMFhNj_g --index_name video-transcripts-vect --filepath ./data/summary_transcripts
+python ./scripts/rag_assistant.py --index_name video-transcripts-vect --video_id zjkBMFhNj_g --query "What is Jailbreak in context of LLMs?"
+```
+
+Below commands can be used to generate gold standard data with provided list of video ids.
+```shell
+docker compose -f docker-compose-gpu.yml up -d    # this runs the llm model on gpu, use docker-compose.yml file if gpu is not available
+python ./scripts/get_multitranscript.py --inp ./data/vidsource.csv --dest ./data/summary_transcripts --index_name "video-transcripts-vect"
+python ./scripts/get_groundtruth.py --index_name video-transcripts-vect
+```
+
+
+> More details on how to change the parameters passed to scripts can be seen in `README.md`.
+
+
+
+
+
+
+
 <br><br><br><hr><hr>
 
 ### Side notes
