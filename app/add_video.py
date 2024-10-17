@@ -1,42 +1,56 @@
-import time
+import os
 import streamlit as st
+
+from utils.init_app import LANG, EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, INDEX_SETTINGS, LLM_CLIENT, LLM_MODEL
+# from utils.init_app_local import LANG, EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, INDEX_SETTINGS, LLM_CLIENT, LLM_MODEL
+from utils.es_indexer import is_video_id_indexed, index_doc
+from utils.ingest_data import ingest_ytscript
 
 
 def fetch(video_id):
-    # Simulate the fetch process step by step
-    logs = f"Fetching transcript for Video ID: {video_id}...\n"
+    logs = f"INFO: initiated transcript fetch for video id: {video_id}...\n"
     yield logs
-    time.sleep(1)  # Simulate delay
+    tscribe_vid_data = "./app_data"+"/tscribe_vid_"+video_id+".json"
 
-    # Simulate intermediate step
-    logs = "Connecting to video database...\n"
-    yield logs
-    time.sleep(1)
+    if not ES_CLIENT.indices.exists(index=ES_INDEX):        # ideally should not happen as its created while app initialization
+        logs = f"INFO: index '{ES_INDEX}' does not exist, creating index...\n"
+        yield logs
+        ES_CLIENT.indices.create(index=ES_INDEX, body=INDEX_SETTINGS)
+    
+    if is_video_id_indexed(video_id, ES_CLIENT, ES_INDEX):
+        logs = f"INFO: data for video_id {video_id} is already indexed, skipping data fetch...\n"
+        yield logs
+    else:
+        if os.path.exists(tscribe_vid_data):
+            logs = f"INFO: processed transcript data exists for video_id: '{video_id}', skipping data ingest...\n"
+            yield logs
+        else:
+            logs = f"INFO: processed transcript for video_id '{video_id}' does not exist, initiating data ingest...\n"
+            yield logs
 
-    # Simulate successful fetching
-    fetched_data = f"Transcript data for {video_id}"
-    logs = "Transcript fetched successfully.\n"
-    yield logs
+            for ingest_log in ingest_ytscript(video_id, tscribe_vid_data, LANG, LLM_CLIENT, LLM_MODEL):
+                yield ingest_log
+        
+        logs = f"INFO: indexing data for video_id: '{video_id}'...\n"
+        yield logs
+        index_doc(tscribe_vid_data, EMBEDDING_MODEL, ES_CLIENT, ES_INDEX)
 
-    # Update session state video ids list
-    logs = f"Available video options: {st.session_state['video_options']}\n"
+    # update session state video ids list
+    logs = f"INFO: available video options: {st.session_state['video_options']}\n"
     yield logs
 
     if video_id not in st.session_state['video_options']:
         st.session_state['video_options'].append(video_id)
-        logs = f"Video options updated: {st.session_state['video_options']}\n"
+        logs = f"INFO: video options updated: {st.session_state['video_options']}\n"
     else:
-        logs = f"Video ID {video_id} already exists in the options.\n"
+        logs = f"INFO: requested video ID '{video_id}' already exists in the options.\n"
 
     yield logs
-
-    # Final data fetched (you can return or yield as necessary)
-    yield fetched_data
 
 
 
 def show_addvideo_ui():
-    col1, col2 = st.columns([1, 6])     # create two columns: one for the image and one for the title
+    col1, col2 = st.columns([1, 6])
 
     with col1:
         st.image("logo.jpg", width=80)
@@ -49,17 +63,15 @@ def show_addvideo_ui():
         )
     
     video_id = st.text_input("New Video ID", value="", label_visibility="visible")
-    log_area = st.empty()       # text area to display logs
+    log_area = st.empty()                   # text area to display logs
 
     if st.button('Fetch'):
         if video_id:
-            log_text = ""  # initialize log text
+            log_text = ""                   # initialize log text
 
-            # fetch data and update logs dynamically
-            for log in fetch(video_id):
-                log_text += log  # append new log line
+            for log in fetch(video_id):     # dynamic log update
+                log_text += log
                 log_area.text_area("Fetch Logs", value=log_text, height=200, disabled=True)
-                time.sleep(0.5)  # add a small delay to simulate on-the-fly logging
 
             st.success(f"Fetch completed for: {video_id}")
         else:
