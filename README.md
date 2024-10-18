@@ -41,8 +41,6 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 - [x] Add Documentation
 
 
-> Check `development_guide.md` for a detailed documentation of experiments and steps taken to develop this project.
-
 
 > [!NOTE]
 > **Current Status**: The project can be run in at-least 3 possible ways(recommended to go with last option which is the full build of this application):
@@ -51,7 +49,7 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 > * `Streamlit UI: CPU/GPU with complete docker setup`: This is recommended for any user who wants to use the full functionality with all the docker services running and packages installed in docker container. Once the container has been set up, it can be used with ease the next time.
 > <br>**Next Planned Updates**: Adding DB support and User Feedback | Evaluating and Optimizing Retrieval | Prefect data Ingest Pipeline
 
-
+Check `development_guide.md` for a detailed documentation of experiments and steps taken to develop this project.
 
 ## Data Preparation, ElasticSearch Indexing and RAG
 
@@ -125,13 +123,19 @@ Please note, internet connection would be required to download the services(like
 
 ### CLI Mode: Using Scripts
 
+**Ideal Scenario**: For running experiments and testing out RAG framework without going into UI. Requires installing python libraries in a virtual environment.
+
 * Download the project to local and go to the project folder 'VidSage'.
 * Run elasticSearch and Ollama services with below command. If 'docker-compose' works on your installation, use it instead of 'docker compose'.
 ```shell
 docker compose up -d                              # this uses cpu and ram to run the llm model
 docker compose -f docker-compose-gpu.yml up -d    # this runs the llm model on gpu
 ```
-* Use miniconda(or any other tool) of ytour preference to craete a new virtual environment, activate it and then install required libraries.
+* Check the name of ollama service with `docker ps` command, most probably it will be 'vidsage-ollama-1'. Run below command to pull the `gemma2:2b` model which will be used.
+```shell
+docker exec -it vidsage-ollama-1 bash ollama pull gemma2:2b
+```
+* Use miniconda(or any other tool) of your preference to create a new virtual environment, activate it and then install required libraries.
 ```shell
 pip install -r requirements.txt
 ```
@@ -146,6 +150,8 @@ python ./scripts/rag_assistant.py --index_name video-transcripts-vect --video_id
 
 ### Streamlit UI: CPU/GPU with minimal docker setup
 
+**Ideal Scenario**: For easy development of UI and testing out available features of application without building app's docker container. Requires installing python libraries in a virtual environment.
+
 If you don't want to use the full build application with all the services in docker, this method allows you to quickly start ES and Ollama services and get started with Streamlit UI. Follow the steps below.
 
 * Download the project to local and go to the project folder 'VidSage'.
@@ -153,6 +159,10 @@ If you don't want to use the full build application with all the services in doc
 ```shell
 docker compose up -d                              # this uses cpu and ram to run the llm model
 docker compose -f docker-compose-gpu.yml up -d    # this runs the llm model on gpu
+```
+* Check the name of ollama service with `docker ps` command, most probably it will be 'vidsage-ollama-1'. Run below command to pull the `gemma2:2b` model which will be used.
+```shell
+docker exec -it vidsage-ollama-1 bash ollama pull gemma2:2b
 ```
 * Use miniconda(or any other tool) of ytour preference to craete a new virtual environment, activate it and then install required libraries.
 ```shell
@@ -167,12 +177,14 @@ streamlit run vidsage_ui.py
 * On the left sidebar of homepage it will show a spinner with text "Initializing Application...". Once its done in 30-40 seconds, it will turn green with text "Ready...". Now you can use the application features.
 * Go to `AI Assistant` page where some video ids are already available to which you can ask your query. It takes 10-30 seconds to get the reply, depends on resources (duh!).
 * If you want to use any other video to query and its not available in drop-down, go to `Add Video` page. Put in the video id and click on Fetch button.
-> Depending on the length of video this is going to take considerable amount of time so if you're just testing out the application I would `recommend using a nice informative video with length 7-15 minutes`.
+> Depending on the length of video this is going to take considerable amount of time so if you're just testing out the application I would `recommend using a nice informative video with length 10-15 minutes`.
 * Once the video transcript has been fetched(and indexed), it can be queried from "AI Assistant" page.
 
 ### Streamlit UI: CPU/GPU with complete docker setup
 
-This is the recommended way to use this application. All the services will be built inside a docker comtainer and its going to take 15-20 minutes depending on internet speed and hardware. This is just like installing an application, one its done you can launch and use it next time within just a few seconds. Plus, no library gets installed in local, its all in docker land, so enjoy! :)
+**Ideal Scenario**: For end-users of this application. Containerized application with all features enabled to use.
+
+This is the recommended way to use this application. All the services will be built inside a docker comtainer and its going to take 15-20 minutes depending on internet speed and hardware. This is just like installing an application, one its done you can launch and use it next time within just a few seconds. Plus, no library gets installed in local, its all in docker land, so enjoy! :smiley:
 
 **Why 15-20 mnutes?** On its first run it will download images for all the required services as mentioned in `docker-compose-app.yml` file and then downloads the llm model and sentence transformer specified in `.env` file. It also installs the packages mentioned in `requirements.txt` and indexes available video transcripts in 'app_data' folder.
 
@@ -181,5 +193,5 @@ This is the recommended way to use this application. All the services will be bu
 ```shell
 docker compose -f docker-compose-app.yml up -d
 ```
-* It takes 15-20 minutes to build the docker container. Grab a cup of tea, watch an episode of The Big Bang Theory and when you come back, open url http://localhost:8501/ to access the Streamlit UI.
-* Use application, drop suggestions for improvements and if you like it please put a star as that would really motivate me to add more features asap. :)
+* It takes 15-20 minutes to build the docker container. Grab a cup of tea, watch an episode of The Big Bang Theory and when you come back, open url http://localhost:8501/ to access the Streamlit UI. :relaxed:
+* Use the application, drop suggestions for improvements and if you like it please consider giving it a star as that would really motivate me to add more features asap. :relaxed:

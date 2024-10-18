@@ -7,12 +7,29 @@ from sentence_transformers import SentenceTransformer
 from utils.es_indexer import index_doc
 
 
-ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
-ES_INDEX = os.environ.get('ES_INDEX')
-VECTOR_MODEL = os.environ.get('VECTOR_MODEL')
-VECTOR_DIMS = os.environ.get('VECTOR_DIMS')
+# [LLM]
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 OPENAI_API_URL = os.environ.get('OPENAI_API_URL')
+LLM_MODEL = os.environ.get('LLM_MODEL')
+
+# [ElasticSearch]
+ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
+ES_INDEX = os.environ.get('ES_INDEX')
+
+# [Sentence Embedding]
+VECTOR_MODEL = os.environ.get('VECTOR_MODEL')
+VECTOR_DIMS = os.environ.get('VECTOR_DIMS')
+
+# [YouTube Transcript Config]
+LANG = os.environ.get('LANG')
+
+
+LLM_CLIENT = OpenAI(
+    base_url=OPENAI_API_URL,
+    api_key=OPENAI_API_KEY,
+)
+ES_CLIENT = Elasticsearch(ELASTICSEARCH_URL)
+EMBEDDING_MODEL = SentenceTransformer(VECTOR_MODEL)
 
 
 INDEX_SETTINGS = {
@@ -96,13 +113,6 @@ def initialize_es_index(index_name):
     else:
         return []
 
-
-LLM_CLIENT = OpenAI(
-    base_url=OPENAI_API_URL,
-    api_key=OPENAI_API_KEY,
-)
-ES_CLIENT = Elasticsearch(ELASTICSEARCH_URL)
-EMBEDDING_MODEL = SentenceTransformer(VECTOR_MODEL)
 
 
 def initialize_list():
