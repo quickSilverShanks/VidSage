@@ -22,6 +22,9 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 
 ## Workflow
 
+<details>
+  <summary><b>TODO List</b></summary>
+
 - [x] Notebook Experiment: Data Preparation(Transcription, Cleaning & Summarization)
 - [x] Notebook Experiment: Data Preparation(Chunking, Embedding & ElasticSearch Indexing)
 - [x] Notebook Experiment: Basic RAG pipeline (Search - Text|Vector|Hybrid)
@@ -40,14 +43,16 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 - [ ] Additional Features: Evaluation and Optimization of Summarization process
 - [x] Add Documentation
 
+</details>
 
 
 > [!NOTE]
 > **Current Status**: The project can be run in at-least 3 possible ways(recommended to go with last option which is the full build of this application):
 > * `CLI Mode: Using Scripts`: This allows user to get the results in terminal with just a few scripts. User can download any video transcript through scripts and ask any query related to that video. But since this runs in local, it requires you to install required python libraries.
 > * `Streamlit UI: CPU/GPU with minimal docker setup`: This is recommended if you intend to make your own modifications to the application. This option also requires user to install packages in local machine but runs with minimal docker services and has Streamlit UI as well. You can actively make changes to UI and refresh the page to see its effect.
-> * `Streamlit UI: CPU/GPU with complete docker setup`: This is recommended for any user who wants to use the full functionality with all the docker services running and packages installed in docker container. Once the container has been set up, it can be used with ease the next time.
-> <br>**Next Planned Updates**: Adding DB support and User Feedback | Evaluating and Optimizing Retrieval | Prefect data Ingest Pipeline
+> * `Streamlit UI: CPU/GPU with complete docker setup`: This is recommended for end-users who wants to use the full functionality with all the docker services running and packages installed in docker container. Once the container has been set up, it can be used with ease the next time. Its just like installing an application and then using it whenever you want 😉
+
+**Next Planned Updates**: Adding DB support and User Feedback | Evaluating and Optimizing Retrieval | Prefect data Ingest Pipeline
 
 Check `development_guide.md` for a detailed documentation of experiments and steps taken to develop this project.
 
@@ -113,6 +118,10 @@ DB_HOST = "postgres_db"
 DB_PORT = "5432"
 ```
 
+The streamlit application has following pages:
+* Home: Landing page of application with default url http://localhost:8501/. Displays initialization status in the sidebar when opened/reloaded.
+* Add Video: Provides functionality to add a new video user-requested transcript in the ElasticSearch index.
+* AI Assistant: RAG Chatbot for user to query any indexed video.
 
 
 ## Running the Application
@@ -186,7 +195,7 @@ streamlit run vidsage_ui.py
 
 This is the recommended way to use this application. All the services will be built inside a docker comtainer and its going to take 15-20 minutes depending on internet speed and hardware. This is just like installing an application, one its done you can launch and use it next time within just a few seconds. Plus, no library gets installed in local, its all in docker land, so enjoy! :smiley:
 
-**Why 15-20 mnutes?** On its first run it will download images for all the required services as mentioned in `docker-compose-app.yml` file and then downloads the llm model and sentence transformer specified in `.env` file. It also installs the packages mentioned in `requirements.txt` and indexes available video transcripts in 'app_data' folder.
+**Why 15-20 minutes?** On its first run it will download images for all the required services as mentioned in `docker-compose-app.yml` file and then download the llm model and sentence transformer model specified in `.env` file. It also installs the packages mentioned in `requirements.txt` and indexes available video transcripts in 'app_data' folder.
 
 * Download the project to local and go to the project folder 'VidSage'.
 * Run docker compose with below command. If 'docker-compose' works on your installation, use it instead of 'docker compose'.
@@ -194,4 +203,18 @@ This is the recommended way to use this application. All the services will be bu
 docker compose -f docker-compose-app.yml up -d
 ```
 * It takes 15-20 minutes to build the docker container. Grab a cup of tea, watch an episode of The Big Bang Theory and when you come back, open url http://localhost:8501/ to access the Streamlit UI. :relaxed:
-* Use the application, drop suggestions for improvements and if you like it please consider giving it a star as that would really motivate me to add more features asap. :relaxed:
+* Demo Video of application yet to be uploaded.
+
+
+
+<br><br><br><br>
+<hr>
+
+<div align="center">
+If you like this project, please consider giving it a ⭐️ **star** to help others discover it. 
+
+[![GitHub Stars](https://img.shields.io/github/stars/quickSilverShanks/VidSage.svg?style=social)](https://github.com/quickSilverShanks/VidSage/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/quickSilverShanks/VidSage.svg?style=social)](https://github.com/quickSilverShanks/VidSage/network/members)
+[![GitHub Issues](https://img.shields.io/github/issues/quickSilverShanks/VidSage.svg)](https://github.com/quickSilverShanks/VidSage/issues)
+</div>
+Please note this is not open for contributions yet as basic features are still being added in, but feel free to 🍴 **fork** it and explore the code!
