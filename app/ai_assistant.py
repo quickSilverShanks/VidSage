@@ -1,8 +1,8 @@
 import streamlit as st
 
 from utils.rag_hybrid import elastic_search_hybrid, build_prompt, llm
-# from utils.init_app_local import EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, LLM_CLIENT, LLM_MODEL
-from utils.init_app import EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, LLM_CLIENT, LLM_MODEL
+from utils.init_app_local import EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, LLM_CLIENT, LLM_MODEL
+# from utils.init_app import EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, LLM_CLIENT, LLM_MODEL
 
 
 def generate_response(video_id, query, log_update_callback, n_results=4, context_col='smry_text', debug=0):
@@ -36,6 +36,7 @@ def generate_response(video_id, query, log_update_callback, n_results=4, context
 
 
 def show_aibot_ui():
+    st.session_state["disable_content"] = False
     col1, col2 = st.columns([1, 6])
 
     with col1:
@@ -54,17 +55,16 @@ def show_aibot_ui():
     button_col, spinner_col = st.columns([2, 4])
     response_status_area = st.empty()   # placeholder for response generation status
     log_area = st.empty()               # placeholder for active log updates below the button
-    button_disabled = False
 
     with button_col:
-        generate_button = st.button('Generate Response', disabled=button_disabled)
+        generate_button = st.button('Generate Response', disabled=st.session_state["disable_content"])
 
     with spinner_col:
         spinner_placeholder = st.empty()
 
     if generate_button:
         if selected_video and user_query:
-            button_disabled = True      # disable button to prevent multiple clicks
+            st.session_state["disable_content"] = True
 
             with spinner_placeholder:
                 with st.spinner("Generating..."):       # display a spinner on the right side of the button
@@ -78,18 +78,36 @@ def show_aibot_ui():
 
                     # generate the response with real-time log updates
                     response, final_logs = generate_response(selected_video, user_query, update_logs)
+            
+            st.session_state["response"] = response
+            st.session_state["final_logs"] = final_logs
 
             log_area.empty()                # clear the active log area after response generation
             spinner_placeholder.empty()     # clear the spinner placeholder after completion
             response_status_area.empty()    # clear the "Generating Response..." message
-            st.info(response)               # display the rag output
 
-            with st.expander("View Response Logs", expanded=False):
-                st.text_area("Response Logs", value=final_logs, height=200, disabled=True)
+            st.session_state["disable_content"] = False         # enable interaction after response generation
 
-            button_disabled = False         # re-enable the button after generation
         else:
             st.error("Please select a video and enter a query")
 
+    # # display response(rag output)
+    if "response" in st.session_state:
+        st.info(st.session_state["response"])
+    
+    # # user feedback section
+    with st.expander("User Feedback", expanded=False):
+        rating = st.slider("Rate the quality of the answer (1: Poor, 5: Excellent)", 1, 5, 0, disabled=st.session_state["disable_content"])
+        feedback = st.text_area("Additional feedback (optional)")
+
+        if st.button("Submit Feedback", disabled=st.session_state["disable_content"]):
+            if rating==0:
+                st.error("Please give a valid rating(0 is not valid)")
+            else:
+                st.success(f"Thank you for the feedback. Your feedback has been recorded:\n\nRating: {rating} \n Feedback: {feedback}")
+    
+    # if "final_logs" in st.session_state:
+    with st.expander("View Response Logs", expanded=False):
+        st.text_area("Response Logs", value=st.session_state["final_logs"], height=200, disabled=st.session_state["disable_content"])
 
 show_aibot_ui()
