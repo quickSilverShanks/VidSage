@@ -63,6 +63,8 @@ def show_aibot_ui():
         spinner_placeholder = st.empty()
 
     if generate_button:
+        st.session_state["response"] = ""
+        st.session_state["final_logs"] = ""
         if selected_video and user_query:
             st.session_state["disable_content"] = True
 
@@ -78,9 +80,12 @@ def show_aibot_ui():
 
                     # generate the response with real-time log updates
                     response, final_logs = generate_response(selected_video, user_query, update_logs)
-            
-            st.session_state["response"] = response
-            st.session_state["final_logs"] = final_logs
+
+                    # update session state to log with feedback
+                    st.session_state["selected_video"] = selected_video
+                    st.session_state["user_query"] = user_query
+                    st.session_state["response"] = response
+                    st.session_state["final_logs"] = final_logs
 
             log_area.empty()                # clear the active log area after response generation
             spinner_placeholder.empty()     # clear the spinner placeholder after completion
@@ -89,6 +94,8 @@ def show_aibot_ui():
             st.session_state["disable_content"] = False         # enable interaction after response generation
 
         else:
+            st.session_state["user_query"] = ""
+            st.session_state["response"] = ""
             st.error("Please select a video and enter a query")
 
     # # display response(rag output)
@@ -101,10 +108,16 @@ def show_aibot_ui():
         feedback = st.text_area("Additional feedback (optional)")
 
         if st.button("Submit Feedback", disabled=st.session_state["disable_content"]):
-            if rating==0:
+            if (st.session_state['user_query'] == "") or (st.session_state['response'] == ""):
+                st.error("Please query the AI assistant first")
+            elif rating==0:
                 st.error("Please give a valid rating(0 is not valid)")
             else:
-                st.success(f"Thank you for the feedback. Your feedback has been recorded:\n\nRating: {rating} \n Feedback: {feedback}")
+                st.success(f"""Thank you for the feedback. Your feedback has been recorded:\n\n 
+                            Selected Video: {st.session_state['selected_video']} \n\n 
+                            User query: {st.session_state['user_query']} \n\n 
+                            AI Response: {st.session_state['response']} \n\n 
+                            Rating: {rating} \n Feedback: {feedback}""")
     
     # if "final_logs" in st.session_state:
     with st.expander("View Response Logs", expanded=False):
