@@ -114,12 +114,45 @@ python ./scripts/get_multitranscript.py --inp ./data/vidsource.csv --dest ./data
 python ./scripts/get_groundtruth.py --index_name video-transcripts-vect
 ```
 
-
 > More details on how to change the parameters passed to scripts can be seen in `README.md`.
 
 
 
+### Adding PostgreSQL
 
+The docker compose file with ES and Ollama can now be modified to run postgreSQL and adminer as well. Below services can be added in `docker-compose.yaml` or `docker-compose-gpu.yaml` from previous sections. On the first run, it will create the required database.
+```shell
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    ports:
+      - published: 8080
+        target: 8080
+    environment:
+      ADMINER_DESIGN: dracula
+      ADMINER_DEFAULT_SERVER: postgres
+```
+
+Once the services have started we can go to the database viewer, adminer (http://localhost:8080/) and use following credentials:
+```
+database system: postgreSQL
+server: vidsage-postgres-1
+user: postgres
+password: dbpass
+database: vidsage_tscripts
+```
+
+These above credentials are being used in `utils/db.py` to establish the database connection and when running the full build version of application these values will be taken from the `.env` file.
 
 
 
@@ -129,13 +162,16 @@ python ./scripts/get_groundtruth.py --index_name video-transcripts-vect
 
 Useful Reference Links:
 * Nvidia Container Toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
-* Sample Project: https://github.com/AudhootChavan/llm_zc_2024_project_audhoot_chavan_parlamind/blob/main/README.md
 * Video Transcripts Generation: https://www.geeksforgeeks.org/python-downloading-captions-from-youtube/
 * Ready to Use Transcript Data: https://huggingface.co/datasets/PleIAs/YouTube-Commons
 * Mastering Summarization Techniques: A Practical Exploration with LLM - Martin Neznal: https://youtu.be/Uoc1k6xdbEg?si=YxAjgjnkTxIRUCz7
-* Another RAG Project: https://github.com/Alexander-Heinz/vdi_chatbot/tree/main
 * Tool support in ollama for future improvements: https://ollama.com/blog/tool-support
+
+Other RAG Projects:
+* Parlamind: https://github.com/AudhootChavan/llm_zc_2024_project_audhoot_chavan_parlamind/blob/main/README.md
+* VDI Chatbot: https://github.com/Alexander-Heinz/vdi_chatbot/tree/main
 
 Useful Tips:
 * To check how much space is being used by docker, use command  `docker system df -v`.
 * To check how much ram/resources are being used by docker services/containers, use command `docker stats`.
+* To stop the services and also remove the associated volumes (forcing the services to recreate them when restarted), use command `docker-compose down -v`

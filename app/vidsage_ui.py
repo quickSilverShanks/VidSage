@@ -1,4 +1,5 @@
 import streamlit as st
+import utils.db as db
 import utils.init_app_local as init_app
 # import utils.init_app as init_app
 
@@ -22,6 +23,8 @@ if not st.session_state.initialized:
     with sidebar_message.container():
         with st.spinner("Initializing Application..."):
             init_app.initialize_list()
+            db.init_db()
+            db.check_timezone()
         
         sidebar_message.markdown(       # change the spinner to a "Ready..." message when done with init_app
             "<div style='background-color: #77aa44; padding: 7px; border-radius: 5px;'>"

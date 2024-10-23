@@ -2,6 +2,8 @@
 This code conatins functions required for rag assistant in Streamlit UI.
 More RAG features will be added in this code in the future to enhance rag capabilities.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+import json
+import re
 
 
 def elastic_search_hybrid(query, query_vect, es_client, index_name, video_id, n_results=5):
@@ -128,4 +130,61 @@ def llm(prompt, llm_client, llm_model):
         seed=72
     )
 
-    return response.choices[0].message.content
+    answer = response.choices[0].message.content
+
+    token_stats = {
+        "prompt_tokens": response.usage.prompt_tokens,
+        "completion_tokens": response.usage.completion_tokens,
+        "total_tokens": response.usage.total_tokens,
+    }
+
+    return answer, token_stats
+
+
+
+def evaluate_relevance(question, answer, llm_client, llm_model):
+
+    prompt_template = """
+    You are an expert evaluator for a RAG system.
+    Your task is to analyze the relevance of the generated answer to the given question.
+    Based on the relevance of the generated answer, you will classify it
+    as "NON_RELEVANT", "PARTLY_RELEVANT", or "RELEVANT".
+
+    Here is the data for evaluation:
+
+    Question: {question}
+    Generated Answer: {answer}
+
+    Please analyze the content and context of the generated answer in relation to the question
+    and provide your evaluation in parsable JSON without using code blocks:
+
+    {{
+    "Relevance": "NON_RELEVANT" | "PARTLY_RELEVANT" | "RELEVANT",
+    "Explanation": "[Provide a brief explanation for your evaluation]"
+    }}
+    """.strip()
+
+    prompt = prompt_template.format(question=question, answer=answer)
+    evaluation, tokens = llm(prompt, llm_client, llm_model)
+
+    try:
+        match = re.search(r'\{.*?\}', evaluation, re.DOTALL)    # regular expression to match the first instance of text between curly braces
+        eval_extract = match.group(0)
+        json_eval = json.loads(eval_extract)
+        return json_eval, tokens
+    except json.JSONDecodeError:
+        result = {"Relevance": "UNKNOWN", "Explanation": "Failed to parse evaluation"}
+        return result, tokens
+
+
+
+def calculate_openai_cost(model, tokens):
+    
+    if model == "gpt-4o-mini":
+        openai_cost = (
+            tokens["prompt_tokens"] * 0.00015 + tokens["completion_tokens"] * 0.0006
+        ) / 1000
+    else:
+        openai_cost = 0
+
+    return openai_cost
