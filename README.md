@@ -35,7 +35,7 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 - [x] RAG Pipeline in Python Scripts
 - [x] StreamLit: Application UI
 - [x] Docker: Containerize
-- [ ] Portgres: Logging
+- [x] Portgres DB: Logging Conversation and Feedback
 - [ ] Grafana: Reporting and User Feedback
 - [ ] Additional Features: Query Restructure
 - [ ] Additional Features: Document Reranking
@@ -110,12 +110,15 @@ VECTOR_DIMS = 384
 # [YouTube Transcript Config]
 LANG = ['en', 'en-US', ]
 
-# [PostGreSQL]
-DB_NAME = "postgres"
+# [PostgreSQL]
+DB_HOST = "localhost"
+DB_PORT = "5432"
+DB_NAME = "vidsage_tscripts"
 DB_USER = "postgres"
 DB_PASSWORD = "dbpass"
-DB_HOST = "postgres_db"
-DB_PORT = "5432"
+
+# [MISC]
+TIMEZONE = 'Asia/Kolkata'
 ```
 
 The streamlit application has following pages:
@@ -124,13 +127,15 @@ The streamlit application has following pages:
 * AI Assistant: RAG Chatbot for user to query any indexed video.
 
 
+
 ## Running the Application
 
 Before running the application make sure you have `docker`, `docker-compose`(optional) and `git cli` installed in your machine. Its recommended to have 16GB CPU RAM and 4GB GPU but the application has also been successfully tested on 8GB CPU RAM (just that its really slow and might require you to close other running apps to free up some RAM).
 
 Please note, internet connection would be required to download the services(like ElasticSearch, Ollama etc), models(llms like gemma2:2b, sentence transformers etc) and video transcripts. Querying the RAG assistant does not require internet since the llm will be downloaded and used from local.
 
-### CLI Mode: Using Scripts
+<details>
+  <summary><b>CLI Mode: Using Scripts</b></summary>
 
 **Ideal Scenario**: For running experiments and testing out RAG framework without going into UI. Requires installing python libraries in a virtual environment.
 
@@ -157,7 +162,10 @@ python ./scripts/get_transcript.py --video_id YQcuTYcxxWc --index_name video-tra
 python ./scripts/rag_assistant.py --index_name video-transcripts-vect --video_id YQcuTYcxxWc --query "Who was socrates?"
 ```
 
-### Streamlit UI: CPU/GPU with minimal docker setup
+</details>
+
+<details>
+  <summary><b>Streamlit UI: CPU/GPU with minimal docker setup</b></summary>
 
 **Ideal Scenario**: For easy development of UI and testing out available features of application without building app's docker container. Requires installing python libraries in a virtual environment.
 
@@ -189,7 +197,10 @@ streamlit run vidsage_ui.py
 > Depending on the length of video this is going to take considerable amount of time so if you're just testing out the application I would `recommend using a nice informative video with length 10-15 minutes`.
 * Once the video transcript has been fetched(and indexed), it can be queried from "AI Assistant" page.
 
-### Streamlit UI: CPU/GPU with complete docker setup
+</details>
+
+<details>
+  <summary><b>Streamlit UI: CPU/GPU with complete docker setup</b></summary>
 
 **Ideal Scenario**: For end-users of this application. Containerized application with all features enabled to use.
 
@@ -205,6 +216,7 @@ docker compose -f docker-compose-app.yml up -d
 * It takes 15-20 minutes to build the docker container. Grab a cup of tea, watch an episode of The Big Bang Theory and when you come back, open url http://localhost:8501/ to access the Streamlit UI. :relaxed:
 * Demo Video of application yet to be uploaded.
 
+</details>
 
 
 <br><br><br><br>

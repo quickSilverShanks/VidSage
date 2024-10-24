@@ -103,6 +103,8 @@ python ./scripts/get_indexed_vids.py
 Below commands can be used to run Ollama and ElasticSearch Services, pull, pre-process and index the transcript documents and then query the rag assistant.
 ```shell
 docker compose -f docker-compose-gpu.yml up -d    # this runs the llm model on gpu, use docker-compose.yml file if gpu is not available
+# replace the name 'vidsage-ollama-1' below with whatever name gets assigned to ollama container (use docker ps to check the name)
+docker exec -it vidsage-ollama-1 bash ollama pull gemma2:2b
 python ./scripts/get_transcript.py --video_id zjkBMFhNj_g --index_name video-transcripts-vect --filepath ./data/summary_transcripts
 python ./scripts/rag_assistant.py --index_name video-transcripts-vect --video_id zjkBMFhNj_g --query "What is Jailbreak in context of LLMs?"
 ```
@@ -110,6 +112,7 @@ python ./scripts/rag_assistant.py --index_name video-transcripts-vect --video_id
 Below commands can be used to generate gold standard data with provided list of video ids.
 ```shell
 docker compose -f docker-compose-gpu.yml up -d    # this runs the llm model on gpu, use docker-compose.yml file if gpu is not available
+docker exec -it vidsage-ollama-1 bash ollama pull gemma2:2b
 python ./scripts/get_multitranscript.py --inp ./data/vidsource.csv --dest ./data/summary_transcripts --index_name "video-transcripts-vect"
 python ./scripts/get_groundtruth.py --index_name video-transcripts-vect
 ```
@@ -152,7 +155,7 @@ password: dbpass
 database: vidsage_tscripts
 ```
 
-These above credentials are being used in `utils/db.py` to establish the database connection and when running the full build version of application these values will be taken from the `.env` file.
+Default credentials are being used in `utils/db.py` to establish the database connection and when running the full build version of application these values will be taken from the `.env` file.
 
 
 
