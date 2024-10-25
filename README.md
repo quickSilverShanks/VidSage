@@ -52,7 +52,7 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 > * `Streamlit UI: CPU/GPU with minimal docker setup`: This is recommended if you intend to make your own modifications to the application. This option also requires user to install packages in local machine but runs with minimal docker services and has Streamlit UI as well. You can actively make changes to UI and refresh the page to see its effect.
 > * `Streamlit UI: CPU/GPU with complete docker setup`: This is recommended for end-users who wants to use the full functionality with all the docker services running and packages installed in docker container. Once the container has been set up, it can be used with ease the next time. Its just like installing an application and then using it whenever you want 😉
 
-**Next Planned Updates**: Prefect data Ingest Pipeline | Generate Gold standard Data | Evaluating and Optimizing Retrieval | RAG Evaluation
+**Next Planned Updates**: Prefect Data Ingest Pipeline | Generate Gold standard Data | Evaluating and Optimizing Retrieval | RAG Evaluation
 
 Check `development_guide.md` for a detailed documentation of experiments and steps taken to develop this project.
 
@@ -131,7 +131,7 @@ The streamlit application has following pages:
 
 ## Running the Application
 
-Before running the application make sure you have `docker`, `docker-compose`(optional) and `git cli` installed in your machine. Its recommended to have 16GB CPU RAM and 4GB GPU but the application has also been successfully tested on 8GB CPU RAM (just that its really slow and might require you to close other running apps to free up some RAM).
+Before running the application make sure you have `docker`, `docker-compose`(optional) and `git cli` installed in your machine. Its recommended to have 16GB CPU RAM and 4GB GPU but the application has also been successfully tested on 8GB CPU RAM (just that its really slow and might require you to close other running apps to free up some RAM). The full build version of this application, with gpu enabled, will take 16-20 GB disk space. Yes its a lot, but then again, you do get to experiment with llms on your local machine.
 
 Please note, internet connection would be required to download the services(like ElasticSearch, Ollama etc), models(llms like gemma2:2b, sentence transformers etc) and video transcripts. Querying the RAG assistant does not require internet since the llm will be downloaded and used from local.
 
@@ -210,7 +210,7 @@ streamlit run vidsage_ui.py
 
 This is the recommended way to use this application. All the services will be built inside a docker comtainer and its going to take 15-20 minutes depending on internet speed and hardware. This is just like installing an application, one its done you can launch and use it next time within just a few seconds. Plus, no library gets installed in local, its all in docker land, so enjoy! :smiley:
 
-**Why 15-20 minutes?** On its first run it will download images for all the required services as mentioned in `docker-compose-app.yml` file and then download the llm model and sentence transformer model specified in `.env` file. It also installs the packages mentioned in `requirements.txt` and indexes available video transcripts in 'app_data' folder.
+**Why 20-25 minutes?** On its first run it will download images for all the required services as mentioned in `docker-compose-app.yml` file and then download the llm model and sentence transformer model specified in `.env` file. It also installs the packages mentioned in `requirements.txt` and indexes available video transcripts in 'app_data' folder.
 
 * Download the project to local and go to the project folder 'VidSage'.
 * Open the `.env` file and make sure DB_HOST is set to 'vidsage-postgres'.
@@ -218,7 +218,7 @@ This is the recommended way to use this application. All the services will be bu
 ```shell
 docker compose -f docker-compose-app.yml up -d
 ```
-* It takes 15-20 minutes to build the docker container. Grab a cup of tea, watch an episode of The Big Bang Theory and when you come back, open url http://localhost:8501/ to access the Streamlit UI. :relaxed:
+* It takes 20-25 minutes to build the docker container. Grab a cup of tea, watch an episode of The Big Bang Theory and when you come back, open url http://localhost:8501/ to access the Streamlit UI. :relaxed:
 * If you want to check the database/tables that stores data pertaining to your interaction with this application you can open database viewer, adminer (http://localhost:8080/) and use following credentials:
 ```
 database system: postgreSQL

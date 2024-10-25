@@ -2,8 +2,8 @@ from math import ceil
 import os
 import json
 import subprocess
-
 import pandas as pd
+from prefect import flow,task
 
 DOCUMENT_COLS = ['uid', 'text', 'smry_text', 'clean_text', 'keywords']
 
@@ -38,6 +38,7 @@ def load_jsonfile(filename):
 
 
 
+@task(name="append_json_files", log_prints=True)
 def append_json_files(file1, file2, output_file):
     """
     This function appends the content of file2 to file1 and writes the result to output_file.
@@ -52,6 +53,7 @@ def append_json_files(file1, file2, output_file):
 
 
 
+@task(name="create_blocks", log_prints=True)
 def create_blocks(df, block_size=5, stride=1, max_duration=120):
     '''
     Use sliding window of size 'block_size' minutes with stride of 'stride' minutes to generate text blocks.
@@ -128,6 +130,7 @@ def generate_smry(transcript, llm_client, llm_model):
 
 
 
+@task(name="generate_smry", log_prints=True)
 def generate_smry_file(df_in, llm_client, llm_model, text_col='text'):
     '''
     Iterates through each row and generates summary column content for the text in 'text_col'.
@@ -168,6 +171,7 @@ def generate_cleantxt(transcript, llm_client, llm_model):
 
 
 
+@task(name="generate_cleantxt_file", log_prints=True)
 def generate_cleantxt_file(df_in, llm_client, llm_model, text_col='text'):
     '''
     Iterates through each row and generates cleaned text column for the text in 'text_col'.
@@ -206,6 +210,7 @@ def generate_keywords(transcript, llm_client, llm_model):
 
 
 
+@task(name="generate_kwrd_file", log_prints=True)
 def generate_kwrd_file(df_in, llm_client, llm_model, text_col='smry_text'):
     '''
     Iterates through each row and generates keyword column content for the text in 'text_col'.
@@ -220,6 +225,7 @@ def generate_kwrd_file(df_in, llm_client, llm_model, text_col='smry_text'):
 
 
 
+@flow(name="ingest_ytscript", log_prints=True)
 def ingest_ytscript(video_id, tscribe_vid_data, LANG, llm_client, llm_model):
     """
     Process the video transcript for the provided video_id. Creates cleaned text, summary and keywords fields.
@@ -277,3 +283,8 @@ def ingest_ytscript(video_id, tscribe_vid_data, LANG, llm_client, llm_model):
     
     logs = f"INFO: data ingest complete and activeapp json file created.\n"
     yield logs
+
+
+
+if __name__=="__main__":
+    ingest_ytscript.serve(name="tscript-data-ingest")

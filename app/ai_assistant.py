@@ -155,9 +155,7 @@ def show_aibot_ui():
             elif rating==0:
                 st.error("Please give a valid rating(0 is not valid)")
             else:
-                st.success(f"""Thank you for the feedback. Your feedback has been recorded:\n\n
-                            RAG Response Data: {st.session_state['response_data']} \n\n
-                            Rating: {rating} \n Feedback: {feedback}""")
+                st.success(f"""Thank you for the feedback. Your feedback has been recorded!""")
                 db.save_feedback(
                     conversation_id=st.session_state["conversation_id"],
                     rating=rating,
