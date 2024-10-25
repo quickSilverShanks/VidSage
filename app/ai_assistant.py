@@ -4,8 +4,8 @@ import streamlit as st
 
 import utils.db as db
 from utils.rag_hybrid import elastic_search_hybrid, build_prompt, llm, evaluate_relevance, calculate_openai_cost
-from utils.init_app_local import EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, LLM_CLIENT, LLM_MODEL
-# from utils.init_app import EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, LLM_CLIENT, LLM_MODEL
+# from utils.init_app_local import EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, LLM_CLIENT, LLM_MODEL
+from utils.init_app import EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, LLM_CLIENT, LLM_MODEL
 
 
 def generate_response(video_id, query, log_update_callback, n_results=4, context_col='smry_text', debug=0):

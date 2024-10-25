@@ -52,7 +52,7 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 > * `Streamlit UI: CPU/GPU with minimal docker setup`: This is recommended if you intend to make your own modifications to the application. This option also requires user to install packages in local machine but runs with minimal docker services and has Streamlit UI as well. You can actively make changes to UI and refresh the page to see its effect.
 > * `Streamlit UI: CPU/GPU with complete docker setup`: This is recommended for end-users who wants to use the full functionality with all the docker services running and packages installed in docker container. Once the container has been set up, it can be used with ease the next time. Its just like installing an application and then using it whenever you want 😉
 
-**Next Planned Updates**: Adding DB support and User Feedback | Evaluating and Optimizing Retrieval | Prefect data Ingest Pipeline
+**Next Planned Updates**: Adding DB support and User Feedback | Evaluating and Optimizing Retrieval | RAG Evaluation | Prefect data Ingest Pipeline
 
 Check `development_guide.md` for a detailed documentation of experiments and steps taken to develop this project.
 
@@ -96,11 +96,11 @@ The .env file can be used to configure/modify the default behaviour of applicati
 ```bash
 # [LLM]
 OPENAI_API_KEY =  "ollama"
-OPENAI_API_URL = 'http://vidsage-ollama:11434/v1/'
+OPENAI_API_URL = 'http://localhost:11434/v1/'
 LLM_MODEL = 'gemma2:2b'
 
 # [ElasticSearch]
-ELASTICSEARCH_URL = "http://vidsage-elasticsearch:9200"
+ELASTICSEARCH_URL = "http://localhost:9200"
 ES_INDEX = "video-transcripts-app"
 
 # [Sentence Embedding]
@@ -108,9 +108,10 @@ VECTOR_MODEL = 'multi-qa-MiniLM-L6-cos-v1'
 VECTOR_DIMS = 384
 
 # [YouTube Transcript Config]
-LANG = ['en', 'en-US', ]
+LANG = ['en', 'en-US', 'en-GB', ]
 
 # [PostgreSQL]
+# DB_HOST = "vidsage-postgres"
 DB_HOST = "localhost"
 DB_PORT = "5432"
 DB_NAME = "vidsage_tscripts"
@@ -133,6 +134,8 @@ The streamlit application has following pages:
 Before running the application make sure you have `docker`, `docker-compose`(optional) and `git cli` installed in your machine. Its recommended to have 16GB CPU RAM and 4GB GPU but the application has also been successfully tested on 8GB CPU RAM (just that its really slow and might require you to close other running apps to free up some RAM).
 
 Please note, internet connection would be required to download the services(like ElasticSearch, Ollama etc), models(llms like gemma2:2b, sentence transformers etc) and video transcripts. Querying the RAG assistant does not require internet since the llm will be downloaded and used from local.
+
+> To use/test this application's final build will all features follow steps in the section `Streamlit UI: CPU/GPU with complete docker setup`.
 
 <details>
   <summary><b>CLI Mode: Using Scripts</b></summary>
@@ -172,7 +175,8 @@ python ./scripts/rag_assistant.py --index_name video-transcripts-vect --video_id
 If you don't want to use the full build application with all the services in docker, this method allows you to quickly start ES and Ollama services and get started with Streamlit UI. Follow the steps below.
 
 * Download the project to local and go to the project folder 'VidSage'.
-* Run elasticSearch and Ollama services with below command. If 'docker-compose' works on your installation, use it instead of 'docker compose'.
+* Open the `.env` file and make sure DB_HOST is set to 'localhost'.
+* Run required services in docker with below command. If 'docker-compose' works on your installation, use it instead of 'docker compose'.
 ```shell
 docker compose up -d                              # this uses cpu and ram to run the llm model
 docker compose -f docker-compose-gpu.yml up -d    # this runs the llm model on gpu
@@ -209,11 +213,21 @@ This is the recommended way to use this application. All the services will be bu
 **Why 15-20 minutes?** On its first run it will download images for all the required services as mentioned in `docker-compose-app.yml` file and then download the llm model and sentence transformer model specified in `.env` file. It also installs the packages mentioned in `requirements.txt` and indexes available video transcripts in 'app_data' folder.
 
 * Download the project to local and go to the project folder 'VidSage'.
+* Open the `.env` file and make sure DB_HOST is set to 'vidsage-postgres'.
 * Run docker compose with below command. If 'docker-compose' works on your installation, use it instead of 'docker compose'.
 ```shell
 docker compose -f docker-compose-app.yml up -d
 ```
 * It takes 15-20 minutes to build the docker container. Grab a cup of tea, watch an episode of The Big Bang Theory and when you come back, open url http://localhost:8501/ to access the Streamlit UI. :relaxed:
+* If you want to check the database/tables that stores data pertaining to your interaction with this application you can open database viewer, adminer (http://localhost:8080/) and use following credentials:
+```
+database system: postgreSQL
+server: vidsage-postgres
+user: postgres
+password: dbpass
+database: vidsage_tscripts
+```
+
 * Demo Video of application yet to be uploaded.
 
 </details>

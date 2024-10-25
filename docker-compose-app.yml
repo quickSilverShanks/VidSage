@@ -54,6 +54,38 @@ services:
     networks:
       - vid_network
 
+  postgres:
+    image: postgres:16
+    container_name: vidsage-postgres
+    environment:
+      POSTGRES_DB: "vidsage_tscripts"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "dbpass"
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+    - vid_network
+
+  adminer:
+    image: adminer
+    container_name: vidsage-adminer
+    ports:
+      - 8080:8080
+    environment:
+      ADMINER_DESIGN: dracula
+      ADMINER_DEFAULT_SERVER: postgres
+    depends_on:
+      - postgres
+    networks:
+    - vid_network
+
   streamlit:
     build:
       context: .
@@ -62,21 +94,24 @@ services:
     env_file:
       - .env
     ports:
-      - "8501:8501"
+      - "8501:8501"   # Streamlit
+      # - "5000:5000"   # Flask
     volumes:
       - ./app:/app
       - ./app/app_data:/app/app_data
     depends_on:
       elasticsearch:
         condition: service_healthy
-      # ollama:
-      #   condition: service_healthy
-    networks:
-    - vid_network
+      postgres:
+        condition: service_healthy
+    # networks:
+    # - vid_network
+    network_mode: host
 
 volumes:
   elasticsearch-data:
   ollama-data:
+  postgres_data:
 
 networks:
   vid_network:

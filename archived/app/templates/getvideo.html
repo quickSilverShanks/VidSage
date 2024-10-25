@@ -1,0 +1,55 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VidSage: AI-Powered YouTube Video Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">VidSage: AI-Powered YouTube Video Assistant</h1>
+            <form id="fetch-form">
+                <div class="field">
+                    <label class="label">New Video ID</label>
+                    <div class="control">
+                        <input class="input" type="text" name="video_id" placeholder="Enter Video ID" required>
+                    </div>
+                </div>
+                <div class="control">
+                    <button class="button is-primary" type="submit">Fetch</button>
+                </div>
+            </form>
+            <div id="log-area" style="margin-top: 20px;">
+                <h2 class="subtitle">Fetch Logs</h2>
+                <textarea class="textarea" id="log-text" rows="10" readonly></textarea>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.getElementById('fetch-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            fetch('/fetch', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    document.getElementById('log-text').textContent = data.logs;
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

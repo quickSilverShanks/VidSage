@@ -1,9 +1,9 @@
 from math import ceil
 import os
 import json
+import subprocess
 
 import pandas as pd
-from youtube_transcript_api import YouTubeTranscriptApi
 
 DOCUMENT_COLS = ['uid', 'text', 'smry_text', 'clean_text', 'keywords']
 
@@ -232,8 +232,13 @@ def ingest_ytscript(video_id, tscribe_vid_data, LANG, llm_client, llm_model):
     """
     logs = f"INFO: extracting raw video transcript '{video_id}'...\n"
     yield logs
-    srt = YouTubeTranscriptApi.get_transcript(video_id, languages=LANG)
-    df_srt = pd.DataFrame(srt)
+    command = f"python ./utils/fetch_transcript.py --video_id {video_id}"
+    process = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    logs = f"INFO: stdout(fetch_transcript.py): {process.stdout.decode()}\n"
+    yield logs
+    logs = f"INFO/ERROR: stderr(fetch_transcript.py): {process.stderr.decode()}\n"
+    yield logs
+    df_srt = pd.read_csv("./app_data/raw_tscript_"+video_id+".csv")
     yt_transcribed = parse_transcript(df_srt)
     logs = f"INFO: raw transcript extracted with {len(yt_transcribed.split())} words.\n"
     yield logs
