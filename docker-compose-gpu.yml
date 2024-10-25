@@ -24,6 +24,27 @@ services:
             capabilities: ["gpu"]
             count: all  # adjust count for the number of GPUs you want to use
 
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: "vidsage_tscripts"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "dbpass"
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    ports:
+      - published: 8080
+        target: 8080
+    environment:
+      ADMINER_DESIGN: dracula
+      ADMINER_DEFAULT_SERVER: postgres
+
 volumes:
   elasticsearch-data:
   ollama:
+  postgres_data:

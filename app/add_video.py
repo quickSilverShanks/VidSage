@@ -1,8 +1,8 @@
 import os
 import streamlit as st
 
-from utils.init_app import LANG, EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, INDEX_SETTINGS, LLM_CLIENT, LLM_MODEL
-# from utils.init_app_local import LANG, EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, INDEX_SETTINGS, LLM_CLIENT, LLM_MODEL
+# from utils.init_app import LANG, EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, INDEX_SETTINGS, LLM_CLIENT, LLM_MODEL
+from utils.init_app_local import LANG, EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, INDEX_SETTINGS, LLM_CLIENT, LLM_MODEL
 from utils.es_indexer import is_video_id_indexed, index_doc
 from utils.ingest_data import ingest_ytscript
 
