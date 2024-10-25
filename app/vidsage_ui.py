@@ -1,7 +1,7 @@
 import streamlit as st
 import utils.db as db
-import utils.init_app_local as init_app
-# import utils.init_app as init_app
+# import utils.init_app_local as init_app
+import utils.init_app as init_app
 
 
 home = st.Page("home.py", title="Home", icon="🏠")
