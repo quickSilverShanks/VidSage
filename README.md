@@ -52,7 +52,7 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 > * `Streamlit UI: CPU/GPU with minimal docker setup`: This is recommended if you intend to make your own modifications to the application. This option also requires user to install packages in local machine but runs with minimal docker services and has Streamlit UI as well. You can actively make changes to UI and refresh the page to see its effect.
 > * `Streamlit UI: CPU/GPU with complete docker setup`: This is recommended for end-users who wants to use the full functionality with all the docker services running and packages installed in docker container. Once the container has been set up, it can be used with ease the next time. Its just like installing an application and then using it whenever you want 😉
 
-**Next Planned Updates**: Adding DB support and User Feedback | Evaluating and Optimizing Retrieval | RAG Evaluation | Prefect data Ingest Pipeline
+**Next Planned Updates**: Prefect data Ingest Pipeline | Generate Gold standard Data | Evaluating and Optimizing Retrieval | RAG Evaluation
 
 Check `development_guide.md` for a detailed documentation of experiments and steps taken to develop this project.
 
