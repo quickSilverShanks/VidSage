@@ -195,7 +195,7 @@ def check_and_index_video(video_id, index_name, filepath):
     help="The ElasticSearch Index that will keep the processed transcript documents from specified youtube videos"
 )
 def multi_videosrt(inp, dest, index_name):
-    df -= pd.read_csv(inp)
+    df = pd.read_csv(inp)
     vlist = list(df.video_id)
 
     print(f"INFO: total number videos to index is {len(vlist)}.")
