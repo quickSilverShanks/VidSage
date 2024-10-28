@@ -54,6 +54,8 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 
 **Next Planned Updates**: Generate Gold standard Data | Evaluating and Optimizing Retrieval | RAG Evaluation | Add "Fast Mode" of application
 
+Application's screenshots can be seen in the file [`screenshots.md`](https://github.com/quickSilverShanks/VidSage/blob/main/screenshots.md).
+
 ~~Check `development_guide.md` for a detailed documentation of experiments and steps taken to develop this project.~~ (file not updated for latest version of VidSage)
 
 
@@ -248,7 +250,7 @@ database: vidsage_tscripts
 * New videos can be added in 'Add Video' tab of streamlit UI. The data ingest pipeline and logs can be seen in Prefect(runs/flows tab) running on http://localhost:4200/. You won't see anything before adding any video. If the video is not already indexed it will trigger the pipeline and then you can see it in aforementioned prefect tabs.
 
 
-* Demo Video of application yet to be uploaded. Until then, please have a look at the screenshots to get an idea of what to expect.
+* Demo Video of application yet to be uploaded. Until then, please have a look at the [screenshots](https://github.com/quickSilverShanks/VidSage/blob/main/screenshots.md) to get an idea of what to expect.
 
 </details>
 
