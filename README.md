@@ -30,7 +30,7 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 - [x] Notebook Experiment: Basic RAG pipeline (Search - Text|Vector|Hybrid)
 - [ ] Notebook Experiment: Generate Gold Standard Data
 - [ ] Notebook Experiment: Evaluate Retrieval and RAG Flow (Add Hyperopt based optimization parameters)
-- [ ] Prefect: Data Ingestion Pipeline
+- [x] Prefect: Data Ingestion Pipeline
 - [ ] Flask: Retrieval API
 - [x] RAG Pipeline in Python Scripts
 - [x] StreamLit: Application UI
@@ -47,14 +47,32 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 
 
 > [!NOTE]
-> **Current Status**: The project can be run in at-least 3 possible ways(recommended to go with last option which is the full build of this application):
+> **Current Status**: The project can be run in at-least 3 possible ways(recommended to go with first option here which is the full build of this application):
+> * `Streamlit UI: CPU/GPU with complete docker setup`: [for end-users and testers] This is recommended for end-users who wants to use the full functionality with all the docker services running and packages installed in docker container. Once the container has been set up, it can be used with ease the next time. Its just like installing an application and then using it whenever you want 😉
+> * `Streamlit UI: CPU/GPU with minimal docker setup`: [for development and innovation] This is recommended if you intend to make your own modifications to the application. This option also requires user to install packages in local machine but runs with minimal docker services and has Streamlit UI as well. You can actively make changes to UI and refresh the page to see its effect.
 > * `CLI Mode: Using Scripts`: This allows user to get the results in terminal with just a few scripts. User can download any video transcript through scripts and ask any query related to that video. But since this runs in local, it requires you to install required python libraries.
-> * `Streamlit UI: CPU/GPU with minimal docker setup`: This is recommended if you intend to make your own modifications to the application. This option also requires user to install packages in local machine but runs with minimal docker services and has Streamlit UI as well. You can actively make changes to UI and refresh the page to see its effect.
-> * `Streamlit UI: CPU/GPU with complete docker setup`: This is recommended for end-users who wants to use the full functionality with all the docker services running and packages installed in docker container. Once the container has been set up, it can be used with ease the next time. Its just like installing an application and then using it whenever you want 😉
 
-**Next Planned Updates**: Prefect data Ingest Pipeline | Generate Gold standard Data | Evaluating and Optimizing Retrieval | RAG Evaluation
+**Next Planned Updates**: Generate Gold standard Data | Evaluating and Optimizing Retrieval | RAG Evaluation | Add "Fast Mode" of application
 
-Check `development_guide.md` for a detailed documentation of experiments and steps taken to develop this project.
+~~Check `development_guide.md` for a detailed documentation of experiments and steps taken to develop this project.~~ (file not updated for latest version of VidSage)
+
+
+
+## Technologies
+
+- [Python](https://www.python.org) - this project has been developed using python and bash scripts
+- [Jupyter Notebook](https://jupyter.org/) - to perform experiments and evaluation of reterieval and rag pipeline
+- [YouTube Transcript API](https://pypi.org/project/youtube-transcript-api/) - to download youtube video transcripts
+- [Sentence Transformers](https://sbert.net/) - to create vector embeddings
+- [ElasticSearch](https://www.elastic.co/) - to index transcript data and perform hybrid (text + vector) similarity search for retrieval
+- [OpenAI API](https://platform.openai.com/) - to use as LLM and make requests
+- [Docker](https://www.docker.com/)  - to containerize application and required services
+- [Streamlit](https://streamlit.io/) - to create a application UI for end-users to interact with
+- [Prefect](https://www.prefect.io/) - to orchestrate data ingest pipeline tasks and monitor data ingest logs
+- [PostgreSQL](https://www.postgresql.org/) - to log datasets with user conversations and feedbacks for further analysis
+- [Adminer](https://www.adminer.org/) - database management tool to view records in tables petaining to user interactions
+
+
 
 ## Data Preparation, ElasticSearch Indexing and RAG
 
@@ -131,7 +149,7 @@ The streamlit application has following pages:
 
 ## Running the Application
 
-Before running the application make sure you have `docker`, `docker-compose`(optional) and `git cli` installed in your machine. Its recommended to have 16GB CPU RAM and 4GB GPU but the application has also been successfully tested on 8GB CPU RAM (just that its really slow and might require you to close other running apps to free up some RAM).
+Before running the application make sure you have `docker`, `docker-compose`(optional) and `git cli` installed in your machine. Its recommended to have 16GB CPU RAM and 4GB GPU but the application has also been successfully tested on 8GB CPU RAM (just that its really slow and might require you to close other running apps to free up some RAM). The full build version of this application, with gpu enabled, will take 16-20 GB disk space. Yes its a lot, but then again, you do get to experiment with llms on your local machine.
 
 Please note, internet connection would be required to download the services(like ElasticSearch, Ollama etc), models(llms like gemma2:2b, sentence transformers etc) and video transcripts. Querying the RAG assistant does not require internet since the llm will be downloaded and used from local.
 
@@ -199,7 +217,7 @@ streamlit run vidsage_ui.py
 * Go to `AI Assistant` page where some video ids are already available to which you can ask your query. It takes 10-30 seconds to get the reply, depends on resources (duh!).
 * If you want to use any other video to query and its not available in drop-down, go to `Add Video` page. Put in the video id and click on Fetch button.
 > Depending on the length of video this is going to take considerable amount of time so if you're just testing out the application I would `recommend using a nice informative video with length 10-15 minutes`.
-* Once the video transcript has been fetched(and indexed), it can be queried from "AI Assistant" page.
+* Once the video transcript has been fetched(and indexed), in about 7-10 minutes, it can be queried from "AI Assistant" page.
 
 </details>
 
@@ -208,17 +226,17 @@ streamlit run vidsage_ui.py
 
 **Ideal Scenario**: For end-users of this application. Containerized application with all features enabled to use.
 
-This is the recommended way to use this application. All the services will be built inside a docker comtainer and its going to take 15-20 minutes depending on internet speed and hardware. This is just like installing an application, one its done you can launch and use it next time within just a few seconds. Plus, no library gets installed in local, its all in docker land, so enjoy! :smiley:
+This is the recommended way to use this application. All the services will be built inside a docker comtainer and its going to take 20-35 minutes depending on internet speed and hardware. This is just like installing an application, one its done you can launch and use it next time within just a few seconds. Plus, no library gets installed in local, its all in docker land, so enjoy! :smiley:
 
-**Why 15-20 minutes?** On its first run it will download images for all the required services as mentioned in `docker-compose-app.yml` file and then download the llm model and sentence transformer model specified in `.env` file. It also installs the packages mentioned in `requirements.txt` and indexes available video transcripts in 'app_data' folder.
+**Why 20-35 minutes?** On its first run it will download images for all the required services as mentioned in `docker-compose-app.yml` file and then download the llm model and sentence transformer model specified in `.env` file. It also installs the packages mentioned in `requirements.txt` and indexes available video transcripts in 'app_data' folder.
 
 * Download the project to local and go to the project folder 'VidSage'.
-* Open the `.env` file and make sure DB_HOST is set to 'vidsage-postgres'.
-* Run docker compose with below command. If 'docker-compose' works on your installation, use it instead of 'docker compose'.
+* Run docker compose with below command. If 'docker-compose' works on your installation, use it instead of 'docker compose'. Considering it takes time, you might want to see the live logs in front of you, in that case don't use `-d` in below command(in fact, i would recommend to drop -d so you can see what's happening).
 ```shell
 docker compose -f docker-compose-app.yml up -d
 ```
-* It takes 15-20 minutes to build the docker container. Grab a cup of tea, watch an episode of The Big Bang Theory and when you come back, open url http://localhost:8501/ to access the Streamlit UI. :relaxed:
+> If you don't have a gpu, remove the `deploy` section of ollama(lines 34-40) before running above command and you're good to go. Non-GPU version takes less time to fire up the application but it will be slower as its not using gpu.
+* It takes 20-35 minutes to build the docker container. Grab a cup of tea, watch an episode of The Big Bang Theory and when you come back, open url http://localhost:8501/ to access the Streamlit UI. :relaxed:
 * If you want to check the database/tables that stores data pertaining to your interaction with this application you can open database viewer, adminer (http://localhost:8080/) and use following credentials:
 ```
 database system: postgreSQL
@@ -227,8 +245,10 @@ user: postgres
 password: dbpass
 database: vidsage_tscripts
 ```
+* New videos can be added in 'Add Video' tab of streamlit UI. The data ingest pipeline and logs can be seen in Prefect(runs/flows tab) running on http://localhost:4200/. You won't see anything before adding any video. If the video is not already indexed it will trigger the pipeline and then you can see it in aforementioned prefect tabs.
 
-* Demo Video of application yet to be uploaded.
+
+* Demo Video of application yet to be uploaded. Until then, please have a look at the screenshots to get an idea of what to expect.
 
 </details>
 
@@ -243,4 +263,8 @@ If you like this project, please consider giving it a ⭐️ **star** to help ot
 [![GitHub Forks](https://img.shields.io/github/forks/quickSilverShanks/VidSage.svg?style=social)](https://github.com/quickSilverShanks/VidSage/network/members)
 [![GitHub Issues](https://img.shields.io/github/issues/quickSilverShanks/VidSage.svg)](https://github.com/quickSilverShanks/VidSage/issues)
 </div>
+<hr>
+
+<div align="center">
 Please note this is not open for contributions yet as basic features are still being added in, but feel free to 🍴 **fork** it and explore the code!
+</div>

@@ -95,6 +95,7 @@ services:
       - .env
     ports:
       - "8501:8501"   # Streamlit
+      - "4200:4200"   # Prefect
       # - "5000:5000"   # Flask
     volumes:
       - ./app:/app
