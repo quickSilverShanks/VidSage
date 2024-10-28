@@ -5,7 +5,7 @@ import subprocess
 import pandas as pd
 from prefect import flow,task
 
-from utils.init_app import LLM_CLIENT, LLM_MODEL
+from init_app import LLM_CLIENT, LLM_MODEL
 
 DOCUMENT_COLS = ['uid', 'text', 'smry_text', 'clean_text', 'keywords']
 
@@ -68,7 +68,7 @@ def create_blocks(df, block_size=5, stride=1, max_duration=120):
     df_out = pd.DataFrame()
 
     logs = f"INFO: video length {max_len} | block size {block_size} | stride {stride} | max blocks {max_blocks}\n"
-    yield logs
+    print(logs)
 
     for i in range(max_blocks):
         start = i*stride
@@ -77,21 +77,21 @@ def create_blocks(df, block_size=5, stride=1, max_duration=120):
         if (i + 1) % 5 == 0 or i + 1 == max_blocks:
             logs = f"INFO: generated block {i+1} | start {start} | stop {stop} | rows combined {df_block.shape[0]}\n"
             logs += "INFO: reached max blocks limit\n"
-            yield logs
+            print(logs)
         transcribed = parse_transcript(df_block)
         df_block = pd.DataFrame({'block':[i+1], 'text':[transcribed], 'start_time': [min(df_block['start'])]})
         df_out = pd.concat([df_out, df_block])
         if stop >= max_len:
             logs = f"INFO: generated block {i+1} | start {start} | stop {stop} | rows combined {df_block.shape[0]}\n"
             logs += "INFO: reached end of video\n"
-            yield logs
+            print(logs)
             break
     
     df_out.reset_index(drop=True, inplace=True)
     logs = f"INFO: original data {df.shape} | block data {df_out.shape}\n"
-    yield logs
+    print(logs)
 
-    yield df_out
+    return df_out
 
 
 
@@ -240,49 +240,49 @@ def ingest_ytscript(video_id, tscribe_vid_data):
         None
     """
     logs = f"INFO: extracting raw video transcript '{video_id}'...\n"
-    yield logs
-    command = f"python ./utils/fetch_transcript.py --video_id {video_id}"
+    print(logs)
+    command = f"python ./app/utils/fetch_transcript.py --video_id {video_id}"   # REVERT
     process = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     logs = f"INFO: stdout(fetch_transcript.py): {process.stdout.decode()}\n"
-    yield logs
+    print(logs)
     logs = f"INFO/ERROR: stderr(fetch_transcript.py): {process.stderr.decode()}\n"
-    yield logs
-    df_srt = pd.read_csv("./app_data/raw_tscript_"+video_id+".csv")
+    print(logs)
+    df_srt = pd.read_csv("./app/app_data/raw_tscript_"+video_id+".csv") # REVERT
     yt_transcribed = parse_transcript(df_srt)
     logs = f"INFO: raw transcript extracted with {len(yt_transcribed.split())} words.\n"
-    yield logs
+    print(logs)
 
     logs = f"INFO: chunking transcript...\n"
-    yield logs
-
-    for chunking_logs_nchunks in create_blocks(df_srt):
-        if isinstance(chunking_logs_nchunks, str):
-            yield chunking_logs_nchunks
-        else:
-            df_chunks = chunking_logs_nchunks
+    print(logs)
+    df_chunks = create_blocks(df_srt)
     
     logs = f"INFO: generating summary and uid for {df_chunks.shape[0]} chunks...\n"
-    yield logs
+    print(logs)
     df_blocksmry = generate_smry_file(df_chunks, LLM_CLIENT, LLM_MODEL)
     df_blocksmry['uid'] = df_blocksmry.apply(lambda x: video_id + '__B' + str(x['block']) + '__S' + str(x['start_time']), axis=1)
 
     logs = f"INFO: generating clean text...\n"
-    yield logs
+    print(logs)
     df_blocksmry_v2 = generate_cleantxt_file(df_blocksmry, LLM_CLIENT, LLM_MODEL)
 
     logs = f"INFO: generating keywords...\n"
-    yield logs
+    print(logs)
     df_blocksmry_v3 = generate_kwrd_file(df_blocksmry_v2, LLM_CLIENT, LLM_MODEL, text_col='text')
 
     logs = f"INFO: saving json file with documents to be indexed...\n"
-    yield logs
+    print(logs)
     export_df_to_json(df_blocksmry_v3[DOCUMENT_COLS], tscribe_vid_data)
 
-    activeapp_fileloc = './app_data/'
+    activeapp_fileloc = './data/summary_transcripts/'   # REVERT
     if os.path.exists(activeapp_fileloc+"activeapp_tscript.json"):
         append_json_files(activeapp_fileloc+"activeapp_tscript.json", tscribe_vid_data, activeapp_fileloc+"activeapp_tscript.json")
     else:
         append_json_files(activeapp_fileloc+"multi_tscribe.json", tscribe_vid_data, activeapp_fileloc+"activeapp_tscript.json")
     
     logs = f"INFO: data ingest complete and activeapp json file created.\n"
-    yield logs
+    print(logs)
+
+
+
+if __name__=="__main__":
+    ingest_ytscript.serve(name="tscript-data-ingest")

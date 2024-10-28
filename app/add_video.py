@@ -1,12 +1,14 @@
 import os
 import streamlit as st
+from prefect import flow
 
-from utils.init_app import LANG, EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, INDEX_SETTINGS, LLM_CLIENT, LLM_MODEL
+from utils.init_app import EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, INDEX_SETTINGS
 # from utils.init_app_local import LANG, EMBEDDING_MODEL, ES_CLIENT, ES_INDEX, INDEX_SETTINGS, LLM_CLIENT, LLM_MODEL
 from utils.es_indexer import is_video_id_indexed, index_doc
 from utils.ingest_data import ingest_ytscript
 
 
+@flow(log_prints=True)
 def fetch(video_id):
     logs = f"INFO: initiated transcript fetch for video id: {video_id}...\n"
     yield logs
@@ -28,8 +30,10 @@ def fetch(video_id):
             logs = f"INFO: processed transcript for video_id '{video_id}' does not exist, initiating data ingest...\n"
             yield logs
 
-            for ingest_log in ingest_ytscript(video_id, tscribe_vid_data, LANG, LLM_CLIENT, LLM_MODEL):
-                yield ingest_log
+            logs = f"INFO: logs for data ingest pipeline can be seen and monitored in prefect: localhost:4200\n"
+            yield logs
+            for ingest_log in ingest_ytscript(video_id, tscribe_vid_data):
+                print(ingest_log)   # prints that will go to prefect logging
         
         logs = f"INFO: indexing data for video_id: '{video_id}'...\n"
         yield logs

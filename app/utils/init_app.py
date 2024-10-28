@@ -5,6 +5,7 @@ from elasticsearch import Elasticsearch
 from sentence_transformers import SentenceTransformer
 
 from utils.es_indexer import index_doc
+# from es_indexer import index_doc
 
 
 # [LLM]

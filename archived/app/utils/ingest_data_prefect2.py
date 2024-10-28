@@ -5,7 +5,7 @@ import subprocess
 import pandas as pd
 from prefect import flow,task
 
-from utils.init_app import LLM_CLIENT, LLM_MODEL
+from init_app import LLM_CLIENT, LLM_MODEL
 
 DOCUMENT_COLS = ['uid', 'text', 'smry_text', 'clean_text', 'keywords']
 
@@ -241,20 +241,20 @@ def ingest_ytscript(video_id, tscribe_vid_data):
     """
     logs = f"INFO: extracting raw video transcript '{video_id}'...\n"
     yield logs
-    command = f"python ./utils/fetch_transcript.py --video_id {video_id}"
+    command = f"python ./app/utils/fetch_transcript.py --video_id {video_id}"   # REVERT
     process = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     logs = f"INFO: stdout(fetch_transcript.py): {process.stdout.decode()}\n"
     yield logs
     logs = f"INFO/ERROR: stderr(fetch_transcript.py): {process.stderr.decode()}\n"
     yield logs
-    df_srt = pd.read_csv("./app_data/raw_tscript_"+video_id+".csv")
+    df_srt = pd.read_csv("./app/app_data/raw_tscript_"+video_id+".csv") # REVERT
     yt_transcribed = parse_transcript(df_srt)
     logs = f"INFO: raw transcript extracted with {len(yt_transcribed.split())} words.\n"
     yield logs
 
     logs = f"INFO: chunking transcript...\n"
     yield logs
-
+    
     for chunking_logs_nchunks in create_blocks(df_srt):
         if isinstance(chunking_logs_nchunks, str):
             yield chunking_logs_nchunks
@@ -278,7 +278,7 @@ def ingest_ytscript(video_id, tscribe_vid_data):
     yield logs
     export_df_to_json(df_blocksmry_v3[DOCUMENT_COLS], tscribe_vid_data)
 
-    activeapp_fileloc = './app_data/'
+    activeapp_fileloc = './data/summary_transcripts/'   # REVERT
     if os.path.exists(activeapp_fileloc+"activeapp_tscript.json"):
         append_json_files(activeapp_fileloc+"activeapp_tscript.json", tscribe_vid_data, activeapp_fileloc+"activeapp_tscript.json")
     else:
@@ -286,3 +286,8 @@ def ingest_ytscript(video_id, tscribe_vid_data):
     
     logs = f"INFO: data ingest complete and activeapp json file created.\n"
     yield logs
+
+
+
+# if __name__=="__main__":
+#     ingest_ytscript.serve(name="tscript-data-ingest")
