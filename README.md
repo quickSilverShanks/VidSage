@@ -48,7 +48,7 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 
 > [!NOTE]
 > **Current Status**: The project can be run in at-least 3 possible ways(recommended to go with first option here which is the full build of this application):
-> * `Streamlit UI: CPU/GPU with complete docker setup`: [for end-users and testers] This is recommended for end-users who wants to use the full functionality with all the docker services running and packages installed in docker container. Once the container has been set up, it can be used with ease the next time. Its just like installing an application and then using it whenever you want 😉
+> * `Streamlit UI: CPU/GPU with complete docker setup`: [for end-users and testers] This is recommended for end-users who wants to use the full functionality with all the docker services running and packages installed in docker container. Once the container has been set up, it can be used with ease the next time. Its just like installing an application and then using it whenever you want. Its easy to run with just a single line command `docker compose -f docker-compose-app.yml up`(yepp, that's it 😉)
 > * `Streamlit UI: CPU/GPU with minimal docker setup`: [for development and innovation] This is recommended if you intend to make your own modifications to the application. This option also requires user to install packages in local machine but runs with minimal docker services and has Streamlit UI as well. You can actively make changes to UI and refresh the page to see its effect.
 > * `CLI Mode: Using Scripts`: This allows user to get the results in terminal with just a few scripts. User can download any video transcript through scripts and ask any query related to that video. But since this runs in local, it requires you to install required python libraries.
 
@@ -153,7 +153,7 @@ Before running the application make sure you have `docker`, `docker-compose`(opt
 
 Please note, internet connection would be required to download the services(like ElasticSearch, Ollama etc), models(llms like gemma2:2b, sentence transformers etc) and video transcripts. Querying the RAG assistant does not require internet since the llm will be downloaded and used from local.
 
-> To use/test this application's final build will all features follow steps in the section `Streamlit UI: CPU/GPU with complete docker setup`.
+> To use/test this application's final build with all features follow steps in the section `Streamlit UI: CPU/GPU with complete docker setup`.
 
 <details>
   <summary><b>CLI Mode: Using Scripts</b></summary>
@@ -235,7 +235,7 @@ This is the recommended way to use this application. All the services will be bu
 ```shell
 docker compose -f docker-compose-app.yml up -d
 ```
-> If you don't have a gpu, remove the `deploy` section of ollama(lines 34-40) before running above command and you're good to go. Non-GPU version takes less time to fire up the application but it will be slower as its not using gpu.
+> If you don't have a gpu, remove the `deploy` section of ollama(lines 34-40) in the file `docker-compose-app.yml` before running above command and you're good to go. Non-GPU version takes less time to fire up the application but it will be slower as its not using gpu.
 * It takes 20-35 minutes to build the docker container. Grab a cup of tea, watch an episode of The Big Bang Theory and when you come back, open url http://localhost:8501/ to access the Streamlit UI. :relaxed:
 * If you want to check the database/tables that stores data pertaining to your interaction with this application you can open database viewer, adminer (http://localhost:8080/) and use following credentials:
 ```
