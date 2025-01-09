@@ -28,7 +28,7 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 - [x] Notebook Experiment: Data Preparation(Transcription, Cleaning & Summarization)
 - [x] Notebook Experiment: Data Preparation(Chunking, Embedding & ElasticSearch Indexing)
 - [x] Notebook Experiment: Basic RAG pipeline (Search - Text|Vector|Hybrid)
-- [ ] Notebook Experiment: Generate Gold Standard Data
+- [x] Notebook Experiment: Generate Gold Standard Data
 - [ ] Notebook Experiment: Evaluate Retrieval and RAG Flow (Add Hyperopt based optimization parameters)
 - [x] Prefect: Data Ingestion Pipeline
 - [ ] Flask: Retrieval API
@@ -52,7 +52,7 @@ VidSage simplifies knowledge extraction from video content, making it an invalua
 > * `Streamlit UI: CPU/GPU with minimal docker setup`: [for development and innovation] This is recommended if you intend to make your own modifications to the application. This option also requires user to install packages in local machine but runs with minimal docker services and has Streamlit UI as well. You can actively make changes to UI and refresh the page to see its effect.
 > * `CLI Mode: Using Scripts`: This allows user to get the results in terminal with just a few scripts. User can download any video transcript through scripts and ask any query related to that video. But since this runs in local, it requires you to install required python libraries.
 
-**Next Planned Updates**: Generate Gold standard Data | Evaluating and Optimizing Retrieval | RAG Evaluation | Add "Fast Mode" of application
+**Next Planned Updates**: Evaluating and Optimizing Retrieval | RAG Evaluation | Add "Fast Mode" of application
 
 Application's screenshots can be seen in the file [`screenshots.md`](https://github.com/quickSilverShanks/VidSage/blob/main/screenshots.md).
 
@@ -107,6 +107,8 @@ Now that we have at-least a single video transcripted and indexed, run the `rag_
 ```shell
 python ./scripts/rag_assistant.py --index_name video-transcripts-vect --video_id zjkBMFhNj_g --query "What is Jailbreak in context of LLMs?"
 ```
+
+The notebook `generate_ground_truth.ipynb` can be used to generate a ground truth data file. Currently, the notebook was used to create the file `./data/ground_truth/ground_truth_retrieval.json` which contains a maximum of 5 queries for each transcript chunk.
 
 
 
@@ -180,6 +182,9 @@ pip install -r requirements.txt
 ```shell
 python ./scripts/get_transcript.py --video_id YQcuTYcxxWc --index_name video-transcripts-vect --filepath ./data/summary_transcripts
 ```
+> The video_id for any youtube video can be picked from its url after `watch?v=`. See examples below:
+> <br> Instance1: In url https://www.youtube.com/watch?v=FmTsS5xFA6k , the video_id is "FmTsS5xFA6k".
+> <br> Instance2: In url https://www.youtube.com/watch?v=TgisehuGOyY&list=PL8dPuuaLjXtNgK6MZucdYldNkMybYIHKR&index=12 , the video id is "TgisehuGOyY".
 * Run below scripts to ask your question.
 ```shell
 python ./scripts/rag_assistant.py --index_name video-transcripts-vect --video_id YQcuTYcxxWc --query "Who was socrates?"
